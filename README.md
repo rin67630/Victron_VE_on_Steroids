@@ -43,12 +43,12 @@ The Arduino IDE has a great feature: tabs.
 Karajan makes use of the Tabs features of the Arduino IDE to split the code like an orchestral partition into clear subparts  
 for each instrument (purpose):  
 -Configuration  
--Credentials (not to be published)
+-Credentials (not to be published)  
 -Libraries and global variables  
 -Network functions  
 -User functions  
 -Setup  
--Menu for user interaction. 
+-Menu for user interaction.  
 -Fast data (to be processed at 125mS pace)  
 -Slow data (to be processed at 1S pace)  
 -Statistics (to be processed at 1S pace)  
