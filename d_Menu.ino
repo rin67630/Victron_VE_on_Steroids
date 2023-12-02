@@ -17,23 +17,27 @@ void menuRun()
       Serial.flush();
       Serial.swap();
       break;
-     case 'A':  //A0 Report
+    case 'A':  //A0 Report
       TelnetStream.printf ("\nA0 Report\n");
       wirelessPage = 'A';
-      break; 
-     case 'V':  //Values Report
+      break;
+    case 'D':  //Debug Report
+      TelnetStream.printf ("\nDebug Report\n");   // this report changes as programmers test
+      wirelessPage = 'D';
+      break;
+    case 'V':  //Values Report
       TelnetStream.printf ("\nValues Report\n");
       wirelessPage = 'V';
-      break; 
-     case 'I':  //Victron VE stream Report
+      break;
+    case 'I':  //Victron VE stream Report
       TelnetStream.printf ("\nVictron Report\n");
       wirelessPage = 'I';
       break;
-      case 'J':  //Debug Report
+    case 'J':  //Debug Report
       TelnetStream.printf ("\nJob Timing\n");
       wirelessPage = 'J';
       break;
-      case ' ':  //Do nothing
+    case ' ':  //Do nothing
       TelnetStream.printf ("\nSnooze\n");
       wirelessPage = ' ';
       break;

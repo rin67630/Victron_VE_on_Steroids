@@ -15,7 +15,11 @@ void wirelessRun()
       break;
 
     case 'V' : //Print Values
-      TelnetStream.printf("BatV:%3.2f BatI:%3.2f PanV: %3.2f PanW: %3.2f, LoadI %3.2f\n", BatV, BatI, PanV, PanW, LodI);
+      TelnetStream.printf("BatV:%3.2f BatI:%2.3f BatW: %3.2f PanV: %3.2f PanW: %3.2f, LoadI %3.2f, LoadW %3.2f, IOhm %3.4f\n", BatV, BatI, BatW, PanV, PanW, LodI, LodW, IOhm);
+      break;
+
+    case 'D' : //Debug report
+      TelnetStream.printf("BatV:%3.2f BatI:%2.3f DelV: %3.4f DelI: %3.4f, IOhm %3.4f\n", BatV, BatI, dBatV, dBatI, IOhm);
       break;
 
     case 'I' : //Print Victron VE Identifiers list

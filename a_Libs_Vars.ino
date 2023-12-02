@@ -91,14 +91,15 @@ int   DaysOn ;        // HSDS Day sequence number, 0 to 365
 float BatW ;          //  BatV*BatI
 float PanI ;          //  PanW/PanV
 float LodW ;          //  LodI*BatV
+float IOhm ;          //  dV / dI
 
 // ***Power Integrations and mean values***
-float delta_current = 1;
-float delta_voltage = 1;
-float internal_resistance;
-float Whout;           //Wh of the current hour
-float Ahout;           //Ah of the current hour
-float Vavgout;          //Avg voltage in hour
+float dBatI ;         // delta_voltage
+float dBatV ;         // delta_current
+
+float BatWh;          // Wh of the current hour
+float BatAh;          // Ah of the current hour
+float Vavg;           // Avg voltage in hour
 
 
 

@@ -32,15 +32,15 @@ void RecvWithEndMarker() {
 
 void HandleNewData() {
   // We have gotten a field of data
-  if (new_data == true) 
+  if (new_data == true)
   {
     //Copy it to the temp array because parseData will alter it.
-//    digitalWrite(GRNLED, true);
+    //    digitalWrite(GRNLED, true);
     strcpy(tempChars, receivedChars);
     ParseData();
     GatherValues();
     new_data = false;
-//    digitalWrite(GRNLED, false);
+    //    digitalWrite(GRNLED, false);
   }
 }
 
@@ -108,18 +108,24 @@ void ParseData() {
 }
 
 
-void GatherValues()
+void GatherValues()                   // Translate the Victron protocol Keywords/Values into Flioat variables
 {
-float mem;    //  Memory for computing delta BatV and delta BatI
-//  digitalWrite(GRNLED, true);
-  for (int i = 0; i < num_keywords; i++) 
+  float m;                          //  Memory for computing delta BatV and delta BatI
+
+  for (int i = 0; i < num_keywords; i++)
   {
-    mem = BatV;
-    if (String(keywords[i]) == "V")     BatV = atof(value[i]) / 1000;
-    delta_voltage = BatV - mem;
-    mem = BatI;
-    if (String(keywords[i]) == "I")     BatI = atof(value[i]) / 1000;
-    delta_current = BatI - mem;
+    if (String(keywords[i]) == "V")
+    {
+      m = BatV;
+      BatV = atof(value[i]) / 1000;
+      dBatV = BatV - m;      // Used for internal resistance evaluation in Stats
+    }
+    if (String(keywords[i]) == "I")
+    {
+      m = BatI;
+      BatI = atof(value[i]) / 1000;
+      dBatI = BatI - m;      // Used for internal resistance evaluation in Stats
+    }
     if (String(keywords[i]) == "VPV")   PanV = atof(value[i]) / 1000;
 #ifndef ESTIMATE_PANEL_POWER
     if (String(keywords[i]) == "PPV")   PanW = atof(value[i]) / 1000;
@@ -128,5 +134,13 @@ float mem;    //  Memory for computing delta BatV and delta BatI
     if (String(keywords[i]) == "CS")    ChSt = atoi(value[i]);
     if (String(keywords[i]) == "ERR")   Err = atoi(value[i]);
   }
-//  digitalWrite(GRNLED, false);
+
+  // ***Estimate battery's internal resistance***
+  if ((dBatI < -0.1) || (dBatI > 0.1))  // only if variation strong enough.
+  {
+    m = dBatV / dBatI;          // ( r = dv / di)
+    if (m < 0) m = -m ;
+    IOhm =+ (m - IOhm) / 100 ;       // Low pass filter to average IOhm
+  }
+
 }

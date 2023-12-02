@@ -39,7 +39,7 @@ HSDS 0 -- Day sequence number, 0 to 365
 Checksum l:A0002000148 -- Message checksum
  */
 
-#define MPPT_100_30    // Define used Victron Device 
+#define MPPT_75_15    // Define used Victron Device 
 
 // Supported:
 // "MPPT 75  | 10"

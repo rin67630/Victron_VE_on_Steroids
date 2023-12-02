@@ -6,7 +6,7 @@ void setup()
   pinMode(STDLED, OUTPUT);
   // Witty Color LEDs
   pinMode(REDLED, INPUT);    // Tx0 after Serial.Swap()
-  pinMode(GRNLED, INPUT);    // Not assigned
+  pinMode(GRNLED, OUTPUT);    // For debugging
   pinMode(BLULED, INPUT);    // Rx0 after Serial.Swap()
 
   // Networking and Time
