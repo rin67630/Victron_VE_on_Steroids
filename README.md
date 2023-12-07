@@ -1,5 +1,5 @@
 # Victron_VE_on_Steroids
-Use an ESP to log values from Victron devices and much more.
+Use an ESP to log values from Victron devices and much more.  
 The project now has several options:  
 a) plain Victron logger from the VE-direct port.  
 b) Vendor-agnostic smart shunt based on the INA226 chip and an extra shunt.  
