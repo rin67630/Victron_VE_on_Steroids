@@ -9,10 +9,6 @@ Please have a look on the schematic diagram:
 https://github.com/rin67630/Victron_VE_on_Steroids/tree/main/Hardware/Victron-on-Steroids-Smarter-Shunt_Schematic.png
 (if you just want a Victron logger, you just need a Wemos D1, a micro bucket converter and a few wires).
 
-* Remark: the INA226 chip can measure up to 36V off-rails. Also the small DC-DC converters are usually limited to 28V max.  
-So if you have a 48V battery system, you must feed the measurement from the lowest 24V battery, and use the extra-voltage measurement to get the full battery voltage.  
-If you have two 12V batteries and a 24V system, you feed the measurement normally from 24V and use the extra-voltage measurement to get the half battery voltage.  
-
 ## History
 The project started with forking https://github.com/datjan/esp8266-victron-mppt-solarchargecontroller.
 From that I created a variant that does not use SoftwareSerial (a resource hog) and reports on Telnet instead:
