@@ -30,16 +30,13 @@ you will need to define the following buckets:
       
 for each one, enter exactly the buckets ID. you may enter what you want as a bucket name and bucket description.  
 As a data source select " from device write call" out of the drop-down lists.  
-Click on "Add bucket"  
-Finally you should get that picture:  
-![image](https://user-images.githubusercontent.com/14197155/106428750-c090f080-6469-11eb-9144-6d397d9651bf.png)    
+Click on "Add bucket"    
 
 ## Creating a dashboard.
 You can finally enter your first dashboard: Select Dashboards, then  Add Dashboard.  
 - you may enter any dashboard ID, dashboard name, dashboard description.  
 Click on Add Dashboard
-Then click on the name of your newly created dashboard, you will get that picture:  
-![image](https://user-images.githubusercontent.com/14197155/106428750-c090f080-6469-11eb-9144-6d397d9651bf.png)  
+Then click on the name of your newly created dashboard.
 upon clicking on the right slider you enter the design mode (you can do that anytime from anywhere).  
 You may now enter widgets yourself, but for the first dashboard, I can provide a preconfigured powerful dashboard:  
 Click on Settings, on the pop-up click on the tab "Developer"  
@@ -50,11 +47,10 @@ To start easily, I am providing a preconfigured dashboard in a vertical tablet f
 Dashboard_json.h in the Arduino IDE. 
 The file is not intended to be compiled in any way by C++, it is just placed there for convenience. 
 
-"SteroidsADS" with your own device name
-and
-"SoftPower1" with your username at thinger.io.
-with your device and user name.
-The arduino IDE does the job perfectly.
+"Steroids" with your own device name if it is different from Steroids  
+and  
+"SoftPower1" with your username at thinger.io. with your device and user name.  
+The find/replace functionalty of the Arduino IDE does the job perfectly.
 
 Once the file is adapted to your requirement you can cut and paste its content in place of the json content of the tab "Developer".
 Save the developer view.
