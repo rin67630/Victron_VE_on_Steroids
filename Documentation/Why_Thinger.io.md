@@ -14,6 +14,9 @@ You get:
  -   buckets to store long term data (up to 4 free of charge)
  -   device properties (up to 4 free of charge)
 
+(of course the owners of Thinger.io hope you will need more and go for a pay account, but they won't tease you if you remain free, they are really smart guys)  
+I've used their services 3 years long free until I decided to go for a pay scheme with 25 devices. And I still have the free accounts.  
+
 I have used Thinger for a couple of other projects like Drok-Juntek-on Steroids, which is a Home Brew MPPT controler built on commercial buck converters.
 https://github.com/rin67630/Drok-Juntek-on-steroids
 (you can have a look there to see the dashboards and onboard screens)
