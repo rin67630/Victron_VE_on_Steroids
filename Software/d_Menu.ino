@@ -47,7 +47,7 @@ void menuRun()
       serialPage = 'J';
       break;
     case ' ':  //Wait for input
-      Console1.printf ("\nWait for input\n");
+      Console1.printf ("\nWaiting for input\n");
       serialPage = ' ';
       break;
     case 'j':  //Reset Job Maxes

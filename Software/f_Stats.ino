@@ -1,7 +1,7 @@
 void statsRun()
 {
   
-/* *** Compute these values ***
+/* todo Compute these values ***
 BatDD;          //  Deepest Discharge (Ah since last Float)
 BatAD;          //  Average Discharge -"-
 BatLD;          //  Last Discharge    -"-
@@ -14,14 +14,16 @@ BatMV;          //  Number of Deep Discharges
 BatOV;          //  Number of Overvoltages
 */
 
-#ifdef WEATHER_SOURCE_IS_OWM
-if (Minute %10 = 3)    // um Minuten 03, 13, 23, 33 usw...
+HourlyStats();
+
+#ifdef WEATHER_IS_OWM
+if (Minute %10 == 3)    // um Minuten 03, 13, 23, 33 usw...
 {
   if (WiFi.status() == WL_CONNECTED)
   {
     if (Minute % 5 == 1 && Second == 32)                    // call every 5 minutes
     {
-      HTTPClient http;
+//      HTTPClient http;              // now defined at Global scope
       http.begin(WifiClient, OPEN_WEATHER_MAP_URL);
       int httpCode2 = http.GET();
       if (httpCode2 == HTTP_CODE_OK)
@@ -46,5 +48,7 @@ if (Minute %10 = 3)    // um Minuten 03, 13, 23, 33 usw...
   }
 }
 #endif
+
+
 
 }

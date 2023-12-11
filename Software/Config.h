@@ -11,12 +11,12 @@
 
 //----------------------- SOFTWARE OPTIONS ---------------------------------
 #define WEATHER_IS_OWM    // _NONE , _OWM                // (Source of the Weather Information)
-#define DASHBRD_IS_NONE   // _NONE , _THINGER        // (Internet Dashboard)
+#define DASHBRD_IS_NONE   // _NONE , _THINGER            // (Internet Dashboard)
 #define TERM_IS_SERIAL    // _NONE , _TELNET, _SERIAL , _SOFTSER // where do Menus and Reports occur: _SERIAL and D7_IS_VICTRON mutually exclusive )
-#define UDP_IS_RECEIVE       // _NONE , _SEND , _RECEIVE   // (UDP Inter-ESP Communication)
-#define UDP_ADDR          "192.168.188.5"               // (IP of the receiving ESP) 
-#define UDP_PORT          4200                          // (Port used to send/receive Values to other ESP)
-
+#define UDP_IS_RECEIVE       // _NONE , _SEND , _RECEIVE // (UDP Inter-ESP Communication)
+#define UDP_ADDR          "192.168.188.5"                // (IP of the receiving ESP) 
+#define UDP_PORT          4200                           // (Port used to send/receive Values to other ESP)
+ 
 #define DEVICE_NAME            "Victron-Steroids-3"
 
 //--------------------------- ESP SETUP -------------------------------------

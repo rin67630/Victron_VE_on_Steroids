@@ -9,6 +9,8 @@
 
 #include <ESP8266WiFi.h>
 WiFiClient WifiClient;
+#include <ESP8266HTTPClient.h>
+HTTPClient http;
 #include <time.h>
 #include <sntp.h>
 #include <TZ.h>
@@ -25,7 +27,10 @@ WiFiUDP UDP;
 #endif
 
 #ifdef WEATHER_IS_OWM
+
 #include <ArduinoJson.h>  // Libs for Webscraping
+#define OPEN_WEATHER_MAP_URL  "http://api.openweathermap.org/data/2.5/weather?id=" OPEN_WEATHER_MAP_LOCATION_ID "&appid=" OPEN_WEATHER_MAP_APP_ID "&units=" OPEN_WEATHER_MAP_UNITS "&lang="  OPEN_WEATHER_MAP_LANGUAGE
+
 #endif
 
 
@@ -132,6 +137,7 @@ struct payload {
 } payload;
 
 char UDPCharPayload[sizeof(payload)];  //  Array of characters as image of the structure for UDP xmit/rcv
+String  JSONpayload;
 
 //***Operating Values Integrated from Victron***
 float TotKWh;  // H19 Yield total, kWh
