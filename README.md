@@ -41,6 +41,45 @@ https://github.com/rin67630/Drok-Juntek-on-steroids
 (you can have a look there to see the dashboards and onboard screens)  
 I can re-use a lot of code from this project on Victron-on Steroids.  
 
+## Work progress
+(I am on a family-trip in december and have only the Victron, a small Battery, 2 ESP8266 at hand, so I can't test some features.  
+- Victron Input processing:  Working for SmartSolar 75/15, looking for confimations for other modules especially SmartShunts  
+- Victron Input Translation: Working  
+- Shunt INA 226 input processing : programmed, can't test yet.  
+- A0 input processing: Easy, but not yet done.
+- OLED Display: Programm chunks exist, can't test, further progress in January  
+- Weather Data: Working
+- Thinger dashboard: currently testing, not a big issue since program exists  
+- Serial communication: Tested for Telnet, SoftwareSerial and Serial (on receiver only)  
+- UDP synchronization between Sender-Receiver: Working
+- Evaluation of battery internal resistance: apparently Working, plausible results.
+- Evaluation of SOC: ideas not yet done: 
+- Coulomb counting by hours: Programmed (need Thinger to make it Reset-surviving)
+
+- Streamlined configuration, Switching options: Working  
+- Menu over Serial, Telnet, SoftwareSerial: Working  
+- Reports: Working
+
+## My Todo List
+- ESP32 Gateway and Domotic processing  (Scheduled for Q1 2024)
+- Finish work/tests wenn Hardware at hand
+- Battery capacity measurement (over full cycle)
+- Other domotic sensors (Temperature, Humidity, Light flash counter, whatever...)
+- Other domotic actuators (Heating valves, Sender for wireless plugs...
+- Documentation, documentation, documentation...
+
+## Input required !
+- Test with other Victron products  
+- Provide other manufacturer serial processing?  
+- Provide algorithm to evaluate SOC  
+- Provide input for Battery capacity measurement (over full cycle)  
+- Proofread my documentation tell me where it's hard to understand. 
+- Make the Victron serial processing working without configutation files  
+- Reasonable improvement suggestions, especially to streamline the code (while keeping readability)
+
+
+
+
 More to come...
 
 
