@@ -1,57 +1,71 @@
-void getWiFi()              // From memory , Using Defaults, or using SmartConfig
+#define runEvery(t) for (static uint16_t _lasttime; \
+                         (uint16_t)((uint16_t)millis() - _lasttime) >= (t); \
+                         _lasttime += (t))
+
+#if defined(TERM_IS_SOFTSER)
+#if defined(D7_IS_VICTRON)
+SoftwareSerial SwSerial(1, 3);  // SoftwareSerial goes to the regular Serial ports
+#else
+SoftwareSerial SwSerial(13, 15);  // SoftwareSerial goes to D7,D8
+#endif
+#endif
+
+#if defined(DASHBRD_IS_THINGER)
+ThingerESP8266 thing(THINGER_USERNAME, THINGER_DEVICE, THINGER_DEVICE_CREDENTIALS);
+#endif
+
+#if defined(DASHBRD_IS_INFLUX)
+InfluxDBClient client(INFLUXDB_URL, INFLUXDB_ORG, INFLUXDB_BUCKET, INFLUXDB_TOKEN, InfluxDbCloud2CACert);
+#endif
+
+
+void getWiFi()  // From memory , Using Defaults, or using SmartConfig
 {
   int retry = 0;
-  WiFi.mode(WIFI_STA);      // configure WiFi in Station Mode
-  wifi_station_set_hostname(HOST_NAME);
+  WiFi.mode(WIFI_STA);  // configure WiFi in Station Mode
+  wifi_station_set_hostname(DEVICE_NAME);
   wifi_station_set_auto_connect(true);
   delay(WIFI_REPEAT);
   Serial.println("Attempt to connect to WiFi network from EEPROM");
   WiFi.begin();
   delay(WIFI_REPEAT);
-  while (WiFi.status() != WL_CONNECTED)
-  {
+  while (WiFi.status() != WL_CONNECTED) {
     Serial.print(".");
     digitalWrite(STDLED, not digitalRead(STDLED));
-    delay(WIFI_REPEAT) ;
+    delay(WIFI_REPEAT);
     if (retry++ >= WIFI_MAXTRIES) break;
   }
 
-  if (WiFi.status() != WL_CONNECTED)
-  {
+  if (WiFi.status() != WL_CONNECTED) {
     Serial.println("\nConnection timeout expired! Start with default");
     retry = 0;
     WiFi.begin(WIFI_SSID, WIFI_PASS);
-    delay(WIFI_REPEAT * 2 );
-    while (WiFi.status() != WL_CONNECTED)
-    {
+    delay(WIFI_REPEAT * 2);
+    while (WiFi.status() != WL_CONNECTED) {
       Serial.print(".");
       digitalWrite(STDLED, not digitalRead(STDLED));
       delay(WIFI_REPEAT);
       if (retry++ >= WIFI_MAXTRIES) break;
     }
   }
-  if (WiFi.status() != WL_CONNECTED)
-  {
+  if (WiFi.status() != WL_CONNECTED) {
     Serial.println("Connection timeout expired! Start SmartConfig…");
     retry = 0;
     WiFi.beginSmartConfig();
     digitalWrite(STDLED, false);
-    while (WiFi.status() != WL_CONNECTED)
-    {
+    while (WiFi.status() != WL_CONNECTED) {
       Serial.print(".");
       digitalWrite(STDLED, not digitalRead(STDLED));
       delay(WIFI_REPEAT * 4);
       if (retry++ >= WIFI_MAXTRIES) break;
-      if (WiFi.smartConfigDone())
-      {
+      if (WiFi.smartConfigDone()) {
         Serial.println("SmartConfig success!");
-        break; // exit from loop
+        break;  // exit from loop
       }
     }
   }
 
-  if (WiFi.status() != WL_CONNECTED)
-  {
+  if (WiFi.status() != WL_CONNECTED) {
     Serial.println("Connection timeout expired! Running without Network");
     WiFi.mode(WIFI_OFF);
   } else {
@@ -63,82 +77,70 @@ void getWiFi()              // From memory , Using Defaults, or using SmartConfi
     Serial.println(WiFi.localIP());
     digitalWrite(STDLED, true);
   }
-} // End Void GetWiFi
+}  // End Void GetWiFi
 
-void disConnect()
-{
+void disConnect() {
   //  WiFi.disconnect(); //temporarily disconnect WiFi as it's no longer needed
   WiFi.mode(WIFI_OFF);
   // WiFi.forceSleepBegin();  can it save power?
   // WiFi.forceSleepWake();
 }
 
-void myIP()
-{
+void myIP() {
   sprintf(charbuff, "IP= %03d.%03d.%03d.%03d", ip[0], ip[1], ip[2], ip[3]);
 }
 
 // Time management
-void getNTP()
-{
-  if (WiFi.status() == WL_CONNECTED)
-  {
+void getNTP() {
+  if (WiFi.status() == WL_CONNECTED) {
     configTime(MYTZ, NTP_SERVER);
-    now = 1577833200000;   //01 Jan 2020 12:00
+    now = 1577833200000;  //01 Jan 2020 12:00
   }
   now = time(nullptr);
   Epoch = now;
 }
 
-void getEpoch()
-{
+void getEpoch() {
   now = time(nullptr);
   Epoch = now;
 }
 
-void getTimeData()
-{
-  timeinfo  = localtime(&now);  // cf: https://www.cplusplus.com/reference/ctime/localtime/
-  Second    = timeinfo->tm_sec;
-  Minute    = timeinfo->tm_min;
-  Hour      = timeinfo->tm_hour;
-  Weekday   = timeinfo->tm_wday + 1 ;
-  Day       = timeinfo->tm_mday;
-  Month     = timeinfo->tm_mon + 1;
-  Year      = timeinfo->tm_year + 1900; //returns years since 1900
+void getTimeData() {
+  timeinfo = localtime(&now);  // cf: https://www.cplusplus.com/reference/ctime/localtime/
+  Second = timeinfo->tm_sec;
+  Minute = timeinfo->tm_min;
+  Hour = timeinfo->tm_hour;
+  Weekday = timeinfo->tm_wday + 1;
+  Day = timeinfo->tm_mday;
+  Month = timeinfo->tm_mon + 1;
+  Year = timeinfo->tm_year + 1900;  //returns years since 1900
 
-  strftime (DayName , 12, "%A", timeinfo); //cf: https://www.cplusplus.com/reference/ctime/strftime/
-  strftime (MonthName, 12, "%B", timeinfo);
-  strftime (Time, 10, "%T", timeinfo);
-  strftime (Date, 12, "%d/%m/%Y", timeinfo);
+  strftime(DayName, 12, "%A", timeinfo);  //cf: https://www.cplusplus.com/reference/ctime/strftime/
+  strftime(MonthName, 12, "%B", timeinfo);
+  strftime(Time, 10, "%T", timeinfo);
+  strftime(Date, 12, "%d/%m/%Y", timeinfo);
 }
 
-void otaInit()
-{
-  if (WiFi.status() == WL_CONNECTED)
-  {
+void otaInit() {
+  if (WiFi.status() == WL_CONNECTED) {
     // Over the Air Framework
-    ArduinoOTA.onStart([]()
-    {
+    ArduinoOTA.onStart([]() {
       String type;
       if (ArduinoOTA.getCommand() == U_FLASH) {
         type = "sketch";
-      } else { // U_FS
+      } else {  // U_FS
         type = "filesystem";
       }
       // NOTE: if updating FS this would be the place to unmount FS using FS.end()
       Serial.println("Start updating " + type);
     });
-    ArduinoOTA.onEnd([]()
-    {
+    ArduinoOTA.onEnd([]() {
       Serial.println("\nEnd");
     });
-    ArduinoOTA.onProgress([](unsigned int progress, unsigned int total)
-    {
+    ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
       Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
     });
-    ArduinoOTA.onError([](ota_error_t error)
-    {
+    ArduinoOTA.onError([](ota_error_t error) {
       Serial.printf("Error[%u]: ", error);
       if (error == OTA_AUTH_ERROR) {
         Serial.printf("Auth Failed\n");
@@ -152,9 +154,9 @@ void otaInit()
         Serial.printf("End Failed\n");
       }
     });
-    ArduinoOTA.setHostname(HOST_NAME);
+    ArduinoOTA.setHostname(DEVICE_NAME);
     Serial.print("\nStart OTA on ");
-    Serial.println (HOST_NAME);
+    Serial.println(DEVICE_NAME);
     ArduinoOTA.begin();
   }
 }

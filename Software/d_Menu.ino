@@ -1,49 +1,62 @@
 void menuRun()
 {
-  switch (TelnetStream.read())
+  switch (Console1.read())
   {
     case 'Z':   // Reset ESP
-      TelnetStream.stop();
+      Console1.printf ("\nReset Device, Bye! \n");
+#if defined(TERM_IS_TELNET)
+      Console1.stop();
+#endif
       delay(100);
       ESP.reset();
       break;
+    case 'z':  //Reset 
+      Console1.printf ("\nReset Integrations \n");
+      BatDD = BatAD = BatLD = BatCD = BatMC = BatAC = BatLC = BatCC = BatMV = BatOV = 0 ;          //  Number of Overvoltages
+      break;
+#if defined(TERM_IS_TELNET)
     case 'Q':   // Quit Telnet
-      TelnetStream.println("bye bye");
-      TelnetStream.flush();
+      Console1.println("bye bye");
+      Console1.flush();
       TelnetStream.stop();
       break;
+#endif
     case 'S':  // Swap Serial
-      TelnetStream.println("Swapping Serial");
+      Console1.println("Swapping Serial");
       Serial.flush();
       Serial.swap();
       break;
     case 'A':  //A0 Report
-      TelnetStream.printf ("\nA0 Report\n");
-      wirelessPage = 'A';
+      Console1.printf ("\nA0 Report\n");
+      serialPage = 'A';
       break;
     case 'D':  //Debug Report
-      TelnetStream.printf ("\nDebug Report\n");   // this report changes as programmers test
-      wirelessPage = 'D';
+      Console1.printf ("\nDebug Report\n");   // this report changes as programmers test
+      serialPage = 'D';
       break;
     case 'V':  //Values Report
-      TelnetStream.printf ("\nValues Report\n");
-      wirelessPage = 'V';
+      Console1.printf ("\nValues Report\n");
+      serialPage = 'V';
       break;
     case 'I':  //Victron VE stream Report
-      TelnetStream.printf ("\nVictron Report\n");
-      wirelessPage = 'I';
+      Console1.printf ("\nVictron Report\n");
+      serialPage = 'I';
       break;
     case 'J':  //Debug Report
-      TelnetStream.printf ("\nJob Timing\n");
-      wirelessPage = 'J';
+      Console1.printf ("\nJob Timing\n");
+      serialPage = 'J';
       break;
-    case ' ':  //Do nothing
-      TelnetStream.printf ("\nSnooze\n");
-      wirelessPage = ' ';
+    case ' ':  //Wait for input
+      Console1.printf ("\nWait for input\n");
+      serialPage = ' ';
       break;
     case 'j':  //Reset Job Maxes
-      TelnetStream.printf ("\nReset Job Timings \n");
+      Console1.printf ("\nReset Job Timings \n");
       for (int i = 14; i < 21; i++) RunMillis[i] = 0;  // Reset job timing stats
+      break;
+      case 'W':  //Weather Plot
+      serialPage = 'W';
+      Console1.printf ("\nWeather list :\n");
       break;
   }
 }

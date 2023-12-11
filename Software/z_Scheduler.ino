@@ -3,8 +3,10 @@ void loop()
     //*** Process Data from Victron VE port ***
 
   RunMillis[0] =  millis() - MillisMem;  
+#if defined(D7_IS_VICTRON)  
   RecvWithEndMarker();               //Get Victron serial stream
   HandleNewData();                   //Interpret Results
+#endif
   RunMillis[1] =  millis() - MillisMem;
   
   //*** Scheduler for other tasks ***  

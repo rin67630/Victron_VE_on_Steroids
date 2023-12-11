@@ -105,7 +105,7 @@ void ParseData() {
     blockindex = 0;
     blockend = false;
   }
-}
+} // End Parse Date
 
 
 void GatherValues()                   // Translate the Victron protocol Keywords/Values into Flioat variables
@@ -116,23 +116,23 @@ void GatherValues()                   // Translate the Victron protocol Keywords
   {
     if (String(keywords[i]) == "V")
     {
-      m = BatV;
-      BatV = atof(value[i]) / 1000;
-      dBatV = BatV - m;      // Used for internal resistance evaluation in Stats
+      m = payload.BatV;
+      payload.BatV = atof(value[i]) / 1000;
+      dBatV = payload.BatV - m;      // Used for internal resistance evaluation in Stats
     }
     if (String(keywords[i]) == "I")
     {
-      m = BatI;
-      BatI = atof(value[i]) / 1000;
-      dBatI = BatI - m;      // Used for internal resistance evaluation in Stats
+      m = payload.BatI;
+      payload.BatI = atof(value[i]) / 1000;
+      dBatI = payload.BatI - m;      // Used for internal resistance evaluation in Stats
     }
-    if (String(keywords[i]) == "VPV")   PanV = atof(value[i]) / 1000;
+    if (String(keywords[i]) == "VPV")   payload.PanV = atof(value[i]) / 1000;
 #ifndef ESTIMATE_PANEL_POWER
-    if (String(keywords[i]) == "PPV")   PanW = atof(value[i]) / 1000;
+    if (String(keywords[i]) == "PPV")   payload.PanW = atof(value[i]) / 1000;
 #endif
-    if (String(keywords[i]) == "IL")    LodI = atof(value[i]) / 1000;
-    if (String(keywords[i]) == "CS")    ChSt = atoi(value[i]);
-    if (String(keywords[i]) == "ERR")   Err = atoi(value[i]);
+    if (String(keywords[i]) == "IL")    payload.LodI = atof(value[i]) / 1000;
+    if (String(keywords[i]) == "CS")    payload.ChSt = atoi(value[i]);
+    if (String(keywords[i]) == "ERR")   payload.Err = atoi(value[i]);
   }
 
   // ***Estimate battery's internal resistance***
@@ -140,7 +140,45 @@ void GatherValues()                   // Translate the Victron protocol Keywords
   {
     m = dBatV / dBatI;          // ( r = dv / di)
     if (m < 0) m = -m ;
-    IOhm =+ (m - IOhm) / 100 ;       // Low pass filter to average IOhm
+    payload.IOhm = + (m - payload.IOhm) / 100 ;      // Low pass filter to average IOhm
   }
+} //End Gather Values
 
+void HourlyStats()
+{
+  currentInt += payload.BatI;
+  nCurrent ++;
+
+  if (HourExpiring)
+  {
+    BatAh[Hour] = currentInt / nCurrent;
+    nCurrent = 0;
+    currentInt = 0;
+    BatAh[25] = BatAh[Hour];   //last hour
+    BatAh[26] = 0;             // today (0h->current hour)
+    for  (byte n = 0; n <= Hour; n++)
+    {
+      BatAh[26] = BatAh[26] + BatAh[n];
+    }
+    BatVavg[Hour] = payload.BatV;
+    BatVavg[25] = payload.BatV;
+    BatVavg[26] = 0;              // today (0h->current hour)
+    for  (byte n = 0; n <= Hour; n++)
+    {
+      BatVavg[26] = BatVavg[26] + BatVavg[n];
+    }
+    BatVavg[26] = BatVavg[26] / (Hour + 1) ;
+  } // end hour expiring
+
+  if (DayExpiring)
+  {
+    BatAh[27] = BatAh[26];
+    BatAh[28] = BatAh[27];
+    BatAh[29] = BatAh[28];
+    BatAh[30] = BatAh[29];
+    BatVavg[27] = BatVavg[26];
+    BatVavg[28] = BatVavg[27];
+    BatVavg[29] = BatVavg[28];
+    BatVavg[30] = BatVavg[29];
+  }
 }
