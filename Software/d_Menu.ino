@@ -30,6 +30,10 @@ void menuRun()
       Console1.printf ("\nA0 Report\n");
       serialPage = 'A';
       break;
+    case 'B':  //Battery Report
+      Console1.printf ("\n Battery Stats\n");
+      serialPage = 'B';
+      break;
     case 'D':  //Debug Report
       Console1.printf ("\nDebug Report\n");   // this report changes as programmers test
       serialPage = 'D';

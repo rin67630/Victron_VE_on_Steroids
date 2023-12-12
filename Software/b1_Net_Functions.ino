@@ -29,14 +29,16 @@ void getWiFi()  // From memory , Using Defaults, or using SmartConfig
   Serial.println("Attempt to connect to WiFi network from EEPROM");
   WiFi.begin();
   delay(WIFI_REPEAT);
-  while (WiFi.status() != WL_CONNECTED) {
+  while (WiFi.status() != WL_CONNECTED) 
+  {
     Serial.print(".");
     digitalWrite(STDLED, not digitalRead(STDLED));
     delay(WIFI_REPEAT);
     if (retry++ >= WIFI_MAXTRIES) break;
   }
 
-  if (WiFi.status() != WL_CONNECTED) {
+  if (WiFi.status() != WL_CONNECTED) 
+  {
     Serial.println("\nConnection timeout expired! Start with default");
     retry = 0;
     WiFi.begin(WIFI_SSID, WIFI_PASS);
@@ -48,7 +50,8 @@ void getWiFi()  // From memory , Using Defaults, or using SmartConfig
       if (retry++ >= WIFI_MAXTRIES) break;
     }
   }
-  if (WiFi.status() != WL_CONNECTED) {
+  if (WiFi.status() != WL_CONNECTED) 
+  {
     Serial.println("Connection timeout expired! Start SmartConfig…");
     retry = 0;
     WiFi.beginSmartConfig();
@@ -70,6 +73,7 @@ void getWiFi()  // From memory , Using Defaults, or using SmartConfig
     WiFi.mode(WIFI_OFF);
   } else {
     // show WiFi connection data
+    wifi_station_set_auto_connect(true);
     Serial.println("Connection succeeded");
     //WiFi.printDiag(Serial);
 

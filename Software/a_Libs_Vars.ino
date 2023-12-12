@@ -10,13 +10,14 @@
 #include <ESP8266WiFi.h>
 WiFiClient WifiClient;
 #include <ESP8266HTTPClient.h>
-HTTPClient http;
+//HTTPClient http;
 #include <time.h>
 #include <sntp.h>
 #include <TZ.h>
 #include <ArduinoOTA.h>
 
 #ifndef INA_IS_NONE
+#include <Wire.h> 
 #include <INA.h>
 INA_Class INA;
 #endif
@@ -27,10 +28,8 @@ WiFiUDP UDP;
 #endif
 
 #ifdef WEATHER_IS_OWM
-
 #include <ArduinoJson.h>  // Libs for Webscraping
 #define OPEN_WEATHER_MAP_URL  "http://api.openweathermap.org/data/2.5/weather?id=" OPEN_WEATHER_MAP_LOCATION_ID "&appid=" OPEN_WEATHER_MAP_APP_ID "&units=" OPEN_WEATHER_MAP_UNITS "&lang="  OPEN_WEATHER_MAP_LANGUAGE
-
 #endif
 
 
@@ -184,6 +183,6 @@ float outdoor_temperature;
 float outdoor_humidity;
 float outdoor_pressure;
 float wind_speed;
-int wind_direction;
-int cloudiness;
+int   wind_direction;
+int   cloudiness;
 String weather_summary;

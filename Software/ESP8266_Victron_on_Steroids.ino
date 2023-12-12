@@ -22,8 +22,8 @@
           RESET        |       GPIO001 TX0
   0..1V   ADC    LDR   |       GPIO003 RX0 
   PwerDwn CH_PD        |       GPIO05  D1      SCL
-  D0 O2   GPIO16       | BTN   GPIO04  D2      SDA   On board Button
-  D5 O1   GPIO14       |       GPIO00  D3         (Flash)
+  D0      GPIO16       | BTN   GPIO04  D2      SDA   On board Button
+  D5      GPIO14       |       GPIO00  D3         (Flash)
   D6      GPIO12 RGB-G |       GPIO02  D4 TX1 , PWM, onboard LED
   D7 RX0* GPIO13 RGB-B | RGB-R GPIO15  D8 TX0*   
           VCC 5V       |       GND
@@ -32,8 +32,8 @@
 
           RESET        |       GPIO001 TX0
   0..3,3V ADC          |       GPIO003 RX0 
-  D0 O2   GPIO16       |       GPIO05  D1      SCL
-  D0 O1   GPIO14       | BTN   GPIO04  D2      SDA
+  D0      GPIO16       |       GPIO05  D1      SCL
+  D5      GPIO14       | BTN   GPIO04  D2      SDA
   D6 RX0  GPIO12       |       GPIO00  D3         (Flash)
   D7 TX0  GPIO13       |       GPIO02  D4 TX1 , PWM, onboard LED
   D8 TX0* GPIO15       |       GND
