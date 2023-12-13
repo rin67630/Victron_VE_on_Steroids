@@ -49,23 +49,23 @@ I can re-use a lot of code from this project on Victron-on Steroids.
 - A0 input processing: Easy, but not yet done.
 - OLED Display: Programm chunks exist, can't test, further progress in January  
 - Weather Data: Working
-- Thinger dashboard: currently testing, not a big issue since program exists  
-- Serial communication: Tested for Telnet, SoftwareSerial and Serial (on receiver only)  
+- Thinger dashboard: Working  
+- Serial communication: Working for Telnet, SoftwareSerial and Serial (on receiver only)  
 - UDP synchronization between Sender-Receiver: Working
 - Evaluation of battery internal resistance: apparently Working, plausible results.
 - Evaluation of SOC: ideas not yet done: 
-- Coulomb counting by hours: Programmed (need Thinger to make it Reset-surviving)
-
+- Making integration data reset-proof: Working  
+- Coulomb counting by hours: Working  
 - Streamlined configuration, Switching options: Working  
 - Menu over Serial, Telnet, SoftwareSerial: Working  
 - Reports: Working
 
 ## My Todo List
 - ESP32 Gateway and Domotic processing  (Scheduled for Q1 2024)
-- Finish work/tests wenn Hardware at hand
-- Battery capacity measurement (over full cycle)
+- Finish work/tests when Hardware at hand
+- Battery capacity measurement (over full cycle) currently doable with the existing B report  
 - Other domotic sensors (Temperature, Humidity, Light flash counter, whatever...)
-- Other domotic actuators (Heating valves, Sender for wireless plugs...
+- Other domotic actuators (Relays, Heating valves, Sender for wireless plugs...
 - Documentation, documentation, documentation...
 
 ## Input required !
