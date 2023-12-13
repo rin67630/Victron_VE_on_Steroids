@@ -18,39 +18,39 @@ void serialRun()
       Console1.print  (" Hour   |");
       for  (byte n = 0; n < 12; n++)
       {
-        Console1.printf("   %02u   |", n);
+        Console1.printf("  %02u   |", n);
       }
       Console1.print  ("\n Bat Ah |");
       for  (byte n = 0; n < 12; n++)
       {
-        Console1.printf(" %+02.3f |", BatAh[n]);
+        Console1.printf(" %05.2f |", BatAh[n]);
       }
       Console1.print  ("\n Bat V  |");
       for  (byte n = 0; n < 12; n++)
       {
-        Console1.printf(" %+02.2f |", BatVavg[n]);
+        Console1.printf(" %05.2f |", BatVavg[n]);
       }
       Console1.print  ("\n Hour   |");
       for  (byte n = 12; n < 24; n++)
       {
-        Console1.printf("   %02u   |", n);
+        Console1.printf("  %02u   |", n);
       }
       Console1.print  ("\n Bat Ah |");
       for  (byte n = 12; n < 24; n++)
       {
-        Console1.printf(" %+02.3f |", BatAh[n]);
+        Console1.printf(" %05.2f |", BatAh[n]);
       }
       Console1.print  ("\n Bat V  |");
       for  (byte n = 12; n < 24; n++)
       {
-        Console1.printf(" %+02.2f |", BatVavg[n]);
+        Console1.printf(" %05.2f |", BatVavg[n]);
       }
       Console1.println("");
       serialPage = 0;
       break;
 
     case 'D' : //Debug report
-      Console1.printf("BatV:%3.2fV BatI:%2.3fA DelV: %3.4fV DelI: %3.4fA IOhm %3.4fR\n", payload.BatV, payload.BatI, dBatV, dBatI, payload.IOhm);
+      Console1.printf("BatV:%05.2fV BatI:%05.3fA DelV: %6.4fV DelI: %6.4fA IOhm %5.4fR\n", payload.BatV, payload.BatI, dBatV, dBatI, payload.IOhm);
       break;
 
     case 'I' : //Print Victron VE Identifiers list
@@ -73,7 +73,7 @@ void serialRun()
       break;
 
     case 'V' : //Print Values
-      Console1.printf("BatV:%3.2fV BatI:%2.3fA BatW: %3.2fW PanV: %3.2fV PanW: %3.2fA LoadI: %3.2fA LoadW: %3.2fW IOhm: %3.4fR\n", payload.BatV, payload.BatI, payload.BatW, payload.PanV, payload.PanW, payload.LodI, payload.LodW, payload.IOhm);
+      Console1.printf("BatV:%05.2f BatI:%05.2f BatW: %05.2f PanV: %05.2f PanI: %05.2f PanW: %05.2f LoadI: %05.2f LoadW: %05.2f IOhm: %5.4f\n", payload.BatV, payload.BatI, payload.BatW, payload.PanV, payload.PanI, payload.PanW, payload.LodI, payload.LodW, payload.IOhm);
       break;
 
     case 'W':   // Weather Plot

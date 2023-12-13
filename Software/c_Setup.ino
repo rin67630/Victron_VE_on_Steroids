@@ -212,6 +212,15 @@ void setup()
     out["BatAh"]      = BatAh[25];
   };
 
+    thing["EVENT"] >> [](pson & out)
+  {
+    out["BatI"]      = payload.BatI ;  
+    out["BatV"]      = payload.BatV ;  
+    out["PanV"]      = payload.PanV ;
+    out["LodI"]      = payload.LodI ;
+    out["BatAh"]     = BatAh[25];
+  };
+
   //Communication with Thinger.io
   thing.handle();
   delay(1000); // Wait for contact to happen.

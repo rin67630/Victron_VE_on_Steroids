@@ -1,5 +1,13 @@
 void wirelessRun()
 {
+
+#if defined (DASHBRD_IS_THINGER)
+    if (TrigEvent)   {  thing.write_bucket("EVENT", "EVENT"); TrigEvent = false; }
+    if (NewDay)         thing.write_bucket("DAY", "DAY");
+    if (HourExpiring)   thing.write_bucket("HOUR", "HOUR");
+    if (MinuteExpiring) thing.write_bucket("MIN", "MIN");  
+#endif 
+  
   /*
      ***   UDP Communication  ***
     I am using a quick and dirty method called 'type punning' copying the memory block of a structure into an array of chars,

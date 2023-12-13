@@ -53,8 +53,8 @@ void statsRun()
     BatVavg[30] = BatVavg[29];
   }
 
-  // ***  Persistancy ***
-  // requested to survive reset
+ #if defined (DASHBRD_IS_THINGER)
+// ***  Persistancy ***  (requested to survive reset)
 
   if (Minute % 10 == 2 && Second == 10)                      // call every 10 minutes
   {
@@ -142,6 +142,7 @@ void statsRun()
     statVh["Today"] = BatAh[26];
     thing.set_property("statVh", statVh);
   }
+#endif
 
 #ifdef WEATHER_IS_OWM
   if (WiFi.status() == WL_CONNECTED)

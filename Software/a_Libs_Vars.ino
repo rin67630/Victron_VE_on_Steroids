@@ -84,13 +84,13 @@ char Date[16];
 
 //*** Varables for the scheduler ***
 byte slice;
-boolean Each6S;
 boolean NewMinute;
 boolean MinuteExpiring;
 boolean NewHour;
 boolean HourExpiring;
 boolean NewDay;
 boolean DayExpiring;
+boolean TrigEvent;
 unsigned int RunMillis[28];  // keep trace of consumed time
 
 byte serialPage;
@@ -161,11 +161,11 @@ float BatMV;  //  Number of Deep Discharges
 float BatOV;  //  Number of Overvoltages
 
 //*** Hourly integrated Values
-float BatAh[26];    //  Wh of the current hour
-float BatWh[26];    //  Ah of the current hour
+float BatAh[26];    //  Ah of the current hour
+//float BatWh[26];  //  Wh of the current hour
 float BatVavg[26];  //  Avg voltage in hour
 float currentInt;   //  Averaging bucket for hourly stats
-long nCurrent;      //  Counter for averaging
+long  nCurrent;     //  Counter for averaging
 
 time_t LastFloat;  //  Time of last float
 time_t LastVMin;   //  Time of minimum Voltage

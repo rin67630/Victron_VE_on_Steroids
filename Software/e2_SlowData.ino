@@ -5,7 +5,8 @@ void data1SRun()
   payload.BatW = payload.BatI * payload.BatV;
   payload.LodW = payload.BatV * payload.LodI;
 #ifdef ESTIMATE_PANEL_POWER
-  payload.PanW = payload.BatW + payload.LodW * 1.08;    //the Low-Power Victron MPPT converters do not measure the panel power, here estimated with 92% conversion efficiency
+  payload.PanW = payload.BatW + payload.LodW * 1.08; //the Low-Power Victron MPPT converters do not measure the panel power, here estimated with 92% conversion efficiency
+  if (payload.PanW < 0) payload.PanW = 0;
 #endif
   payload.PanI = payload.PanW / payload.PanV;
 }
