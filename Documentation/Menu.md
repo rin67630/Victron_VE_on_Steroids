@@ -8,7 +8,7 @@ The menu is based on single character terminated by [return]
 
 [space]   stops *periodic* reports and enters snooze mode (doing nothing)  
 Z resets the ESP, which will reboot
-Q quits Telnet. You can reconnect by typing Telnet [the IP of the ESP] again (does nothing on Serial)
+Q quits Telnet. You can reconnect by typing Telnet [the IP of the ESP] again (does nothing on Serial)  
 A prints the A0 report (just showing the A0 value, will be replaced by the Ah report later  
 D *prints the Debugging report (content variable depending on what to debug)*   
 V *prints the Values as Floating values*
