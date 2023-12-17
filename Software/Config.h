@@ -6,9 +6,9 @@
 #define OLED_IS_NONE      // _NONE , _48X48 , _128X48
 #define OLED_IS_NORMAL    // _IS_NORMAL, _IS_REVERSED To turn the display 180° if required
 #define INA_IS_226       // _NONE , _226
-#include "MPPT_75_15.h"
+//#include "MPPT_75_15.h"
 #include "SHUNT_10A_75mV.h" 
-#include "LiFePo_13V_100Ah.h"
+//#include "LiFePo_13V_100Ah.h"
 
 //----------------------- SOFTWARE OPTIONS ---------------------------------
 #define WEATHER_IS_OWM     // _NONE , _OWM              // (Source of the Weather Information)

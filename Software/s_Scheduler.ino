@@ -6,6 +6,7 @@ void loop()
 #if defined(D7_IS_VICTRON)  
   RecvWithEndMarker();               //Get Victron serial stream
   HandleNewData();                   //Interpret Results
+  EstimateIOhm();                    //Estimate internal resitance
 #endif
   RunMillis[1] =  millis() - MillisMem;
   

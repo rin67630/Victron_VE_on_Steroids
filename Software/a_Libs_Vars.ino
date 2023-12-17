@@ -104,6 +104,7 @@ static IPAddress ip;
 //*** Buffers ***
 static char charbuff[120];  //Char buffer for many functions
 
+#if defined(D7_IS_VICTRON) 
 //***Variables for Victron***
 char receivedChars[buffsize];                        // an array to store the received data
 char tempChars[buffsize];                            // an array to manipulate the received data
@@ -113,7 +114,7 @@ char value[num_keywords][value_bytes] = { 0 };       // The array that holds the
 static byte blockindex = 0;
 bool new_data = false;
 bool blockend = false;
-
+#endif
 
 
 struct payload {

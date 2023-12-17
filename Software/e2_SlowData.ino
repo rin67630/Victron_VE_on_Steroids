@@ -45,5 +45,6 @@ void data1SRun()
   payload.BatV += (ina1_voltage / 1000   - payload.BatV) / 3; // Volt Smoothed 0.3seconds
   payload.BatI += (ina1_current / IFACTORB - payload.BatI) / 3; // Ampere Smoothed 0.3seconds, set divisor negative to reverse current if required
   payload.BatW  = payload.BatV * payload.BatI;
+  EstimateIOhm();
   #endif
 }

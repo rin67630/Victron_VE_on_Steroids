@@ -1,4 +1,4 @@
-
+#if defined(D7_IS_VICTRON) 
 // Serial Handling Victron
 // ---
 // This block handles the serial reception of the data in a
@@ -134,12 +134,16 @@ void GatherValues()                   // Translate the Victron protocol Keywords
     if (String(keywords[i]) == "CS")    payload.ChSt = atoi(value[i]);
     if (String(keywords[i]) == "ERR")   payload.Err = atoi(value[i]);
   }
+} //End Gather Values
+#endif // defined Victron
 
+void EstimateIOhm()
+{ 
   // ***Estimate battery's internal resistance***
   if ((dBatI < -0.1) || (dBatI > 0.1))  // only if variation strong enough.
   {
-    m = dBatV / dBatI;          // ( r = dv / di)
+   float m = dBatV / dBatI;          // ( r = dv / di)
     if (m < 0) m = -m ;
     payload.IOhm = + (m - payload.IOhm) / 100 ;      // Low pass filter to average IOhm
   }
-} //End Gather Values
+}

@@ -53,18 +53,6 @@ void serialRun()
       Console1.printf("BatV:%05.2fV BatI:%05.3fA DelV: %6.4fV DelI: %6.4fA IOhm %5.4fR\n", payload.BatV, payload.BatI, dBatV, dBatI, payload.IOhm);
       break;
 
-    case 'I' : //Print Victron VE Identifiers list
-      for (int i = 0; i < num_keywords; i++)
-      {
-        for (int i = 0; i < num_keywords; i++)
-        {
-          Console1.print(keywords[i]);
-          Console1.print(",");
-          Console1.println(value[i]);
-        }
-      }
-      break;
-
     case 'J':   // Job Duration Report for debuggging
       Console1.printf("\nJob Durations(mS) Current - Max\nSche:%03i - %03i \nFast:%03i - %03i\nSlow:%03i - %03i\nStat:%03i - %03i\nDisp:%03i - %03i\nSeri:%03i - %03i\nWifi:%03i - %03i\n",
                       RunMillis[1] - RunMillis[0], RunMillis[14], RunMillis[3] - RunMillis[2], RunMillis[15], RunMillis[5] - RunMillis[4], RunMillis[16], RunMillis[7] - RunMillis[6], RunMillis[17],

@@ -42,10 +42,6 @@ void menuRun()
       Console1.printf ("\nValues Report\n");
       serialPage = 'V';
       break;
-    case 'I':  //Victron VE stream Report
-      Console1.printf ("\nVictron Report\n");
-      serialPage = 'I';
-      break;
     case 'J':  //Debug Report
       Console1.printf ("\nJob Timing\n");
       serialPage = 'J';
