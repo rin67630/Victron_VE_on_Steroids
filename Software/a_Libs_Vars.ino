@@ -119,6 +119,7 @@ bool blockend = false;
 struct payload {
   //***Operating Values from Victron/SmartShunt***
   float BatV;  // V   Battery voltage, V
+  float BatV1; // V   Battery voltage, V  (Double or half Voltage)
   float BatI;  // I   Battery current, A
   float BatW;  //  BatV*BatI
 
@@ -186,3 +187,11 @@ float wind_speed;
 int   wind_direction;
 int   cloudiness;
 String weather_summary;
+
+#ifndef INA_IS_NONE
+byte devicesFound =      0; 
+float ina1_voltage;
+float ina1_current;
+float ina1_shunt;
+float ina1_power;
+#endif

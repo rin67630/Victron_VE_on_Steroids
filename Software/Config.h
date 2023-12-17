@@ -1,12 +1,13 @@
 
 //----------------------- HARDWARE OPTIONS ---------------------------------
-
-#define AO_IS_NONE        // _NONE , _DOUBLE-BATTERY , _HALF-BATTERY
+#define AO_IS_DOUBLEBATTERY        // _NONE , _DOUBLEBATTERY , _HALFBATTERY, _PANEL
+#define A0_MAX       50   // if A0 is used, define the voltage of the full range measure
 #define D7_IS_NONE        // _NONE , _VICTRON
 #define OLED_IS_NONE      // _NONE , _48X48 , _128X48
 #define OLED_IS_NORMAL    // _IS_NORMAL, _IS_REVERSED To turn the display 180° if required
-#define INA_IS_NONE       // _NONE , _226
+#define INA_IS_226       // _NONE , _226
 #include "MPPT_75_15.h"
+#include "SHUNT_10A_75mV.h" 
 #include "LiFePo_13V_100Ah.h"
 
 //----------------------- SOFTWARE OPTIONS ---------------------------------

@@ -24,6 +24,17 @@ void setup()
   Serial.printf("\nOpening UDP port: %u", ESP_UDP_PORT);
 #endif
 
+#ifndef INA_IS_NONE
+  // INA 226 Panel Sensor
+  INA.begin( AMPERE0 , SHUNT0, 0);      // Define max Ampere, Shunt value, Address
+  INA.setBusConversion(100);            // Maximum conversion time 100ms
+  INA.setShuntConversion(100);          // Maximum conversion time 100ms
+  INA.setAveraging(32);                  // Average each reading n-times
+  INA.setMode(INA_MODE_CONTINUOUS_BOTH); // Bus/shunt measured continuously
+  //  INA.alertOnPowerOverLimit(true;450000); //Set alert when power over 45W.
+#endif
+
+
   getEpoch();            // writes the Epoch (Numbers of seconds till 1.1.1970...
   Serial.println("\nGot Epoch");
   getTimeData();         // breaks down the Epoch into discrete values.
@@ -181,14 +192,14 @@ void setup()
 
   thing["HOUR"] >> [](pson & out)
   {
-    out["Batv"]  = payload.BatV;
+    out["BatV"]  = payload.BatV;
     out["BatI"]  = payload.BatI;
-    out["Wbat"]  = payload.BatW;
+    out["BatW"]  = payload.BatW;
     out["PanI"]  = payload.PanI ;
-    out["Vpan"]  = payload.PanV ;
-    out["Wpan"]  = payload.PanW;
+    out["PanV"]  = payload.PanV ;
+    out["PanW"]  = payload.PanW;
     out["Ohm"]   = payload.IOhm;
-    out["BatV"] = BatAh[25];
+    out["BatAh"] = BatAh[25];
     out["percent_charged"] = payload.ChSt;
 
     out["temperature"]  = outdoor_temperature;
