@@ -40,6 +40,10 @@ I have used Thinger for a couple of other projects like Drok-Juntek-on Steroids,
 https://github.com/rin67630/Drok-Juntek-on-steroids   
 (you can have a look there to see the dashboards and onboard screens)  
 I can re-use a lot of code from this project on Victron-on Steroids.  
+The current default Thinger Screen looksl ike that:   
+<img width="577" alt="grafik" src="https://github.com/rin67630/Victron_VE_on_Steroids/assets/14197155/1099efec-f5a8-4a19-942d-5ba23037a395">
+But everyone is free to design his own dashboard online !
+
 
 ## Work progress
 (I am on a family-trip in december and have only the Victron, a small Battery, 2 ESP8266 at hand, so I can't test some features.  
