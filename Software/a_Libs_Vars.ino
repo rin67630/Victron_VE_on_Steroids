@@ -6,7 +6,7 @@
 #define runEvery(t) for (static uint16_t _lasttime; (uint16_t)((uint16_t)millis() - _lasttime) >= (t); _lasttime += (t))  // Macro for Timing
 
 // *** Libraries and instanciations***
-
+#include <Wire.h> 
 #include <ESP8266WiFi.h>
 WiFiClient WifiClient;
 #include <ESP8266HTTPClient.h>
@@ -16,8 +16,17 @@ WiFiClient WifiClient;
 #include <TZ.h>
 #include <ArduinoOTA.h>
 
+#ifndef OLED_IS_NONE
+#include "SSD1306Wire.h"  // from https://github.com/ThingPulse/esp8266-oled-ssd1306/
+#endif
+#ifdef OLED_IS_64x48
+SSD1306Wire display(0x3c, SDA, SCL, GEOMETRY_64_48 ); // WEMOS OLED 64*48 shield
+#endif
+#ifdef OLED_IS_128x64
+SSD1306Wire display(0x3c, SDA, SCL);                  //OLED 128*64 soldered
+#endif
+
 #ifndef INA_IS_NONE
-#include <Wire.h> 
 #include <INA.h>
 INA_Class INA;
 #endif
@@ -31,7 +40,6 @@ WiFiUDP UDP;
 #include <ArduinoJson.h>  // Libs for Webscraping
 #define OPEN_WEATHER_MAP_URL  "http://api.openweathermap.org/data/2.5/weather?id=" OPEN_WEATHER_MAP_LOCATION_ID "&appid=" OPEN_WEATHER_MAP_APP_ID "&units=" OPEN_WEATHER_MAP_UNITS "&lang="  OPEN_WEATHER_MAP_LANGUAGE
 #endif
-
 
 #if defined(DASHBRD_IS_THINGER)
 #include <ThingerESP8266.h>
@@ -56,11 +64,6 @@ WiFiUDP UDP;
 #include <TelnetStream.h>
 #define Console1 TelnetStream
 #endif
-
-#ifndef OLED_IS_NONE
-#include "SSD1306Wire.h"  // from https://github.com/ThingPulse/esp8266-oled-ssd1306/
-#endif
-
 
 
 //***Variables for Time***
@@ -100,7 +103,6 @@ byte wirelessPage;
 
 static IPAddress ip;
 
-
 //*** Buffers ***
 static char charbuff[120];  //Char buffer for many functions
 
@@ -118,6 +120,7 @@ bool blockend = false;
 
 
 struct payload {
+  byte  DevNr = DEVICE_NUMBER;  // Device number 1..4 when using an ESP32 supervisor.
   //***Operating Values from Victron/SmartShunt***
   float BatV;  // V   Battery voltage, V
   float BatV1; // V   Battery voltage, V  (Double or half Voltage)
@@ -132,8 +135,8 @@ struct payload {
   float LodW;  //  LodI*BatV
   float IOhm;  //  dV / dI
 
-  int ChSt;       // CS  Charge state, 0 to 9
-  int Err;        // ERR Error code, 0 to 119
+  int ChSt;    // CS  Charge state, 0 to 9
+  int Err;     // ERR Error code, 0 to 119
   boolean LodOn;  // LOAD ON Load output state, ON/OFF
 } payload;
 

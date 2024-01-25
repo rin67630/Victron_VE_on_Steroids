@@ -62,9 +62,8 @@ void loop()
         statsRun();
         RunMillis[7] =  millis() - MillisMem;
         break;
-      case 4:                       // Starting the OTA Handler every second
+      case 4:
         RunMillis[8] =  millis() - MillisMem;
-        ArduinoOTA.handle();
         displayRun();               // Starting the display updates every second
         RunMillis[9] =  millis() - MillisMem;
         break;
@@ -78,7 +77,8 @@ void loop()
         if (WiFi.status() == WL_CONNECTED) wirelessRun();
         RunMillis[13] =  millis() - MillisMem;
         break;
-      case 8:                     // Reinitializations and Timing report
+      case 8:                     // OTA, Reinitializations and Timing report
+        ArduinoOTA.handle();
         RunMillis[14] = max( RunMillis[14], RunMillis[1] - RunMillis[0]);   // Max Millis Victron handler
         RunMillis[15] = max( RunMillis[15], RunMillis[3] - RunMillis[2]);   // Max Millis Menu and 125mS Data
         RunMillis[16] = max( RunMillis[16], RunMillis[5] - RunMillis[4]);   // Max Millis 1S Data

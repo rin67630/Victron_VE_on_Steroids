@@ -2,23 +2,6 @@
                          (uint16_t)((uint16_t)millis() - _lasttime) >= (t); \
                          _lasttime += (t))
 
-#if defined(TERM_IS_SOFTSER)
-#if defined(D7_IS_VICTRON)
-SoftwareSerial SwSerial(1, 3);  // SoftwareSerial goes to the regular Serial ports
-#else
-SoftwareSerial SwSerial(13, 15);  // SoftwareSerial goes to D7,D8
-#endif
-#endif
-
-#if defined(DASHBRD_IS_THINGER)
-ThingerESP8266 thing(THINGER_USERNAME, THINGER_DEVICE, THINGER_DEVICE_CREDENTIALS);
-#endif
-
-#if defined(DASHBRD_IS_INFLUX)
-InfluxDBClient client(INFLUXDB_URL, INFLUXDB_ORG, INFLUXDB_BUCKET, INFLUXDB_TOKEN, InfluxDbCloud2CACert);
-#endif
-
-
 void getWiFi()  // From memory , Using Defaults, or using SmartConfig
 {
   int retry = 0;
@@ -68,7 +51,8 @@ void getWiFi()  // From memory , Using Defaults, or using SmartConfig
     }
   }
 
-  if (WiFi.status() != WL_CONNECTED) {
+  if (WiFi.status() != WL_CONNECTED) 
+  {
     Serial.println("Connection timeout expired! Running without Network");
     WiFi.mode(WIFI_OFF);
   } else {
@@ -76,26 +60,20 @@ void getWiFi()  // From memory , Using Defaults, or using SmartConfig
     wifi_station_set_auto_connect(true);
     Serial.println("Connection succeeded");
     //WiFi.printDiag(Serial);
-
-    // show the IP address assigned to our device
-    Serial.println(WiFi.localIP());
-    digitalWrite(STDLED, true);
+    digitalWrite(STDLED, true);   
   }
 }  // End Void GetWiFi
 
-void disConnect() {
+void disConnect() 
+{
   //  WiFi.disconnect(); //temporarily disconnect WiFi as it's no longer needed
   WiFi.mode(WIFI_OFF);
   // WiFi.forceSleepBegin();  can it save power?
   // WiFi.forceSleepWake();
 }
 
-void myIP() {
-  sprintf(charbuff, "IP= %03d.%03d.%03d.%03d", ip[0], ip[1], ip[2], ip[3]);
-}
-
-// Time management
-void getNTP() {
+void getNTP() 
+{
   if (WiFi.status() == WL_CONNECTED) {
     configTime(MYTZ, NTP_SERVER);
     now = 1577833200000;  //01 Jan 2020 12:00
@@ -104,12 +82,14 @@ void getNTP() {
   Epoch = now;
 }
 
-void getEpoch() {
+void getEpoch() 
+{
   now = time(nullptr);
   Epoch = now;
 }
 
-void getTimeData() {
+void getTimeData() 
+{
   timeinfo = localtime(&now);  // cf: https://www.cplusplus.com/reference/ctime/localtime/
   Second = timeinfo->tm_sec;
   Minute = timeinfo->tm_min;
@@ -125,12 +105,20 @@ void getTimeData() {
   strftime(Date, 12, "%d/%m/%Y", timeinfo);
 }
 
-void otaInit() {
-  if (WiFi.status() == WL_CONNECTED) {
+void buffTimeData()
+{
+  strftime(charbuff, sizeof(charbuff), "%R %x", timeinfo);
+}
+
+void initOTA() 
+{
+  if (WiFi.status() == WL_CONNECTED) 
+  {
     // Over the Air Framework
     ArduinoOTA.onStart([]() {
       String type;
-      if (ArduinoOTA.getCommand() == U_FLASH) {
+      if (ArduinoOTA.getCommand() == U_FLASH) 
+      {
         type = "sketch";
       } else {  // U_FS
         type = "filesystem";
@@ -158,9 +146,5 @@ void otaInit() {
         Serial.printf("End Failed\n");
       }
     });
-    ArduinoOTA.setHostname(DEVICE_NAME);
-    Serial.print("\nStart OTA on ");
-    Serial.println(DEVICE_NAME);
-    ArduinoOTA.begin();
   }
 }

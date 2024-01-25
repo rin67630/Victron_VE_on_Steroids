@@ -7,7 +7,12 @@ void wirelessRun()
     if (HourExpiring)   thing.write_bucket("HOUR", "HOUR");
     if (MinuteExpiring) thing.write_bucket("MIN", "MIN");  
 #endif 
-  
+
+  if (SecondOfDay == 39000)  //Somewehere during the middle of the day, resync time
+  {
+getNTP();
+getTimeData();
+  }
   /*
      ***   UDP Communication  ***
     I am using a quick and dirty method called 'type punning' copying the memory block of a structure into an array of chars,

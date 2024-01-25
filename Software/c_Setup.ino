@@ -1,69 +1,33 @@
 void setup()
 {
+#if defined(TERM_IS_SOFTSER)
+#if defined(D7_IS_VICTRON)
+  SoftwareSerial SwSerial(1, 3);  // SoftwareSerial goes to the regular Serial ports
+#else
+  SoftwareSerial SwSerial(13, 15);  // SoftwareSerial goes to D7,D8
+#endif
+#endif
+
+#if defined(DASHBRD_IS_THINGER)
+  ThingerESP8266 thing(THINGER_USERNAME, THINGER_DEVICE, THINGER_DEVICE_CREDENTIALS);
+#endif
+
+#if defined(DASHBRD_IS_INFLUX)
+  InfluxDBClient client(INFLUXDB_URL, INFLUXDB_ORG, INFLUXDB_BUCKET, INFLUXDB_TOKEN, InfluxDbCloud2CACert);
+#endif
+
   delay(3000); // Wait for serial monitor to be started
   Serial.begin(SERIAL_SPEED);
   Serial.setRxBufferSize(1024);
+  // Serial.setDebugOutput(true);
   Serial.printf("\n\n\nVictron Logger at work,\nSerial @ %u Baud\n", SERIAL_SPEED);
+  Wire.begin(SDA, SCL);
+
   pinMode(STDLED, OUTPUT);   // Blue LED on the ESP
   // Witty Color LEDs
   pinMode(REDLED, INPUT);    // Tx0 after Serial.Swap()
   pinMode(GRNLED, OUTPUT);   // For debugging
   pinMode(BLULED, INPUT);    // Rx0 after Serial.Swap()
-
-  // Networking and Time
-  getWiFi();
-  //WiFi.printDiag(Serial);
-  Serial.printf("MAC address: %s , \nHostname: %s", WiFi.macAddress().c_str(), WiFi.hostname().c_str());
-  digitalWrite(STDLED, true);
-
-  getNTP();
-  delay(3000);
-
-#ifndef UDP_IS_NONE  
-  UDP.begin(ESP_UDP_PORT); 
-  Serial.printf("\nOpening UDP port: %u", ESP_UDP_PORT);
-#endif
-
-#ifndef INA_IS_NONE
-  // INA 226 Panel Sensor
-  INA.begin( AMPERE0 , SHUNT0, 0);      // Define max Ampere, Shunt value, Address
-  INA.setBusConversion(100);            // Maximum conversion time 100ms
-  INA.setShuntConversion(100);          // Maximum conversion time 100ms
-  INA.setAveraging(32);                  // Average each reading n-times
-  INA.setMode(INA_MODE_CONTINUOUS_BOTH); // Bus/shunt measured continuously
-  //  INA.alertOnPowerOverLimit(true;450000); //Set alert when power over 45W.
-#endif
-
-
-  getEpoch();            // writes the Epoch (Numbers of seconds till 1.1.1970...
-  Serial.println("\nGot Epoch");
-  getTimeData();         // breaks down the Epoch into discrete values.
-  sprintf(charbuff, "Now is %02d:%02d:%02d, Date is %s, %02d %s %04d", Hour, Minute, Second, DayName, Day, MonthName, Year);
-  Serial.println(charbuff);
-
-  otaInit();
-  Serial.println("OTA ready");
-  delay(500);
-
-#if defined (TERM_IS_SERIAL)
-  Serial.println("Menu ready!");
-#endif
-
-#if defined (TERM_IS_SOFTSER)
-  SwSerial.begin(SERIAL_SPEED);
-  Serial.println("Menu ready on SoftSerial");
-#endif
-
-#if defined (TERM_IS_TELNET)
-  TelnetStream.begin();
-  Serial.println("Menu ready on Telnet");
-  Serial.flush();
-  delay(500);
-#endif
-
-#if defined (D7_IS_VICTRON)
-  Serial.swap();
-#endif
 
 #ifndef OLED_IS_NONE
   // Initialising the UI will init the display too.
@@ -81,6 +45,63 @@ void setup()
   display.display();
 #endif
 
+  // Networking and Time
+  getWiFi();
+  //WiFi.printDiag(Serial);
+  // show the IP address assigned to our device
+  Serial.print("IP  address: ");
+  Serial.println(WiFi.localIP());
+  Serial.printf("MAC address: %s , \nHostname: %s", WiFi.macAddress().c_str(), WiFi.hostname().c_str());
+  digitalWrite(STDLED, true);
+
+#ifndef OLED_IS_NONE   //Display connection information
+  display.drawString(0, 24, WiFi.localIP().toString());
+  display.display();
+  delay(2000);
+#endif
+
+  getNTP();
+  delay(3000);
+  getEpoch();            // writes the Epoch (Numbers of seconds till 1.1.1970...
+  Serial.println("\nGot Epoch");
+  getTimeData();         // breaks down the Epoch into discrete values.
+  sprintf(charbuff, "Now is %02d:%02d:%02d, Date is %s, %02d %s %04d", Hour, Minute, Second, DayName, Day, MonthName, Year);
+  Serial.println(charbuff);
+
+  initOTA();
+  ArduinoOTA.setHostname(DEVICE_NAME);
+  Serial.print("Start OTA on ");
+  Serial.println(DEVICE_NAME);
+  ArduinoOTA.begin();
+  delay(500);
+
+  
+#ifndef UDP_IS_NONE
+  UDP.begin(ESP_UDP_PORT);
+  Serial.printf("\nOpening UDP port: %u", ESP_UDP_PORT);
+#endif
+
+#if defined (TERM_IS_SERIAL)
+  Serial.println("Menu ready on Serial!");
+#endif
+
+#if defined (TERM_IS_SOFTSER)
+  SwSerial.begin(SERIAL_SPEED);
+  Serial.println("Menu ready on SoftSerial");
+#endif
+
+#if defined (TERM_IS_TELNET)
+  TelnetStream.begin();
+  Serial.println("Menu ready on Telnet");
+  Serial.flush();
+  delay(500);
+#endif
+
+#if defined (D7_IS_VICTRON)
+  Serial.println("Serial Swap to Victron");
+  Serial.swap();
+#endif
+
 #if defined INA_IS_226
   Wire.begin(SDA, SCL);
   // INA 226 Panel Sensor
@@ -92,7 +113,6 @@ void setup()
   //  INA.alertOnPowerOverLimit(true;450000); //Set alert when power over 45W.
 #endif
 
-
 #if defined (DASHBRD_IS_THINGER)
   // *** Thinger configuration ***
   // definition of structures for transmission
@@ -100,7 +120,6 @@ void setup()
   // resource output example (i.e. reading a sensor value) https://docs.thinger.io/coding#define-output-resources
   // https://docs.thinger.io/coding#read-multiple-data
   // it is a bit confusing, but Thinger code placed in setup will be executed when required by the payload.
-
 
   // Device
   thing["menu"] << [](pson & in) {
@@ -131,7 +150,7 @@ void setup()
     out["pressure"]    = outdoor_pressure;
     out["wind"]        = wind_speed;
     out["direction"]   = wind_direction;
-    out["cloudiness"]  = cloudiness;    
+    out["cloudiness"]  = cloudiness;
     out["summary"]     = weather_summary;
   };
 
@@ -162,7 +181,7 @@ void setup()
     out["B21Ah"] = BatAh[21];
     out["B22Ah"] = BatAh[22];
     out["B23Ah"] = BatAh[23];
-    
+
     out["BVDay"] = BatVavg[27];
     out["B00V"] = BatVavg[0];
     out["B01V"] = BatVavg[1];
@@ -212,9 +231,9 @@ void setup()
 
   thing["MIN"] >> [](pson & out)
   {
-    out["BatI"]      = payload.BatI ;  
-    out["BatV"]      = payload.BatV ;  
-    out["BatW"]      = payload.BatW ;  
+    out["BatI"]      = payload.BatI ;
+    out["BatV"]      = payload.BatV ;
+    out["BatW"]      = payload.BatW ;
     out["PanI"]      = payload.PanI ;
     out["PanV"]      = payload.PanV ;
     out["PanW"]      = payload.PanW ;
@@ -223,10 +242,10 @@ void setup()
     out["BatAh"]      = BatAh[25];
   };
 
-    thing["EVENT"] >> [](pson & out)
+  thing["EVENT"] >> [](pson & out)
   {
-    out["BatI"]      = payload.BatI ;  
-    out["BatV"]      = payload.BatV ;  
+    out["BatI"]      = payload.BatI ;
+    out["BatV"]      = payload.BatV ;
     out["PanV"]      = payload.PanV ;
     out["LodI"]      = payload.LodI ;
     out["BatAh"]     = BatAh[25];
@@ -281,7 +300,7 @@ void setup()
   BatAh[27] = statAh["Yesterday"];
   BatAh[26] = statAh["Today"];
 
-    pson statVh;
+  pson statVh;
   thing.get_property("statVh", statVh);  // 0..23=hour, 25=payload.PanI, 26=statVh 24h, 27= BatAhDay, 28=BatAhNight, 29=BatAh22-24
   BatVavg[0]  = statVh["00h"];
   BatVavg[1]  = statVh["01h"];
