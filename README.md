@@ -46,18 +46,18 @@ But everyone is free to design his own dashboard online !
 
 
 ## Work progress
-(I am on a family-trip in december and have only the Victron, a small Battery, 2 ESP8266 at hand, so I can't test some features.  
-- Victron Input processing:  Working for SmartSolar 75/15, looking for confimations for other modules especially SmartShunts  
+ 
+- Victron Input processing:  Working for SmartSolar 75/15, looking for confimations for other modules especially SmartShunts.  
 - Victron Input Translation: Working  
-- Shunt INA 226 input processing : programmed, can't test yet.  
+- Shunt INA 226 input processing : Working  
 - A0 input processing: Easy, but not yet done.
-- OLED Display: Programm chunks exist, can't test, further progress in January  
+- OLED Display: Working
 - Weather Data: Working
 - Thinger dashboard: Working  
 - Serial communication: Working for Telnet, SoftwareSerial and Serial (on receiver only)  
 - UDP synchronization between Sender-Receiver: Working
 - Evaluation of battery internal resistance: apparently Working, plausible results.
-- Evaluation of SOC: ideas not yet done: 
+- Evaluation of SOC: ideas not yet done. 
 - Making integration data reset-proof: Working  
 - Coulomb counting by hours: Working  
 - Streamlined configuration, Switching options: Working  
@@ -65,8 +65,7 @@ But everyone is free to design his own dashboard online !
 - Reports: Working
 
 ## My Todo List
-- ESP32 Gateway and Domotic processing  (Scheduled for Q1 2024)
-- Finish work/tests when Hardware at hand
+- ESP32 Gateway and Domotic processing  Transmission working, need to convert the program to handle all data in arrays 
 - Battery capacity measurement (over full cycle) currently doable with the existing B report  
 - Other domotic sensors (Temperature, Humidity, Light flash counter, whatever...)
 - Other domotic actuators (Relays, Heating valves, Sender for wireless plugs...
