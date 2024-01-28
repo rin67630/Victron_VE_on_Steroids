@@ -4,3 +4,5 @@ b) Different batteries chemistries and capacities
 c) Different displays  
 are outsourced in configuration files. The configuration is done by including the relevant files.  
 **The Config_Files folder must be placed in the /libraries Folder of your project.**
+
+You are free to create nwe ones.
