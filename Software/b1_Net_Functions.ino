@@ -51,15 +51,15 @@ void getWiFi()  // From memory , Using Defaults, or using SmartConfig
     }
   }
 
+
   if (WiFi.status() != WL_CONNECTED) 
   {
     Serial.println("Connection timeout expired! Running without Network");
     WiFi.mode(WIFI_OFF);
   } else {
-    // show WiFi connection data
+    ip = WiFi.localIP();
     wifi_station_set_auto_connect(true);
     Serial.println("Connection succeeded");
-    //WiFi.printDiag(Serial);
     digitalWrite(STDLED, true);   
   }
 }  // End Void GetWiFi

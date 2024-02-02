@@ -37,9 +37,11 @@ void data1SRun()
   float v = ina1_voltage;
   float w = ina1_current;
   ina1_voltage   = INA.getBusMilliVolts(0);
+#if defined (INA_VBUS_IS_HALF)
+  ina1_voltage   = ina1_voltage * 2;
+#endif
   ina1_shunt     = INA.getShuntMicroVolts(0);
   ina1_current   = INA.getBusMicroAmps(0);
-  ina1_power     = INA.getBusMicroWatts(0);
   dBatV = ina1_voltage - v;          // mV
   dBatV = (ina1_current - w) / 1000;   // mA
   payload.BatV += (ina1_voltage / 1000   - payload.BatV) / 3; // Volt Smoothed 0.3seconds

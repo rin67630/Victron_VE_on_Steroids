@@ -6,9 +6,10 @@
 #define D5_IS_NONE        // _NONE , _RELAY2
 #define D6_IS_NONE        // _NONE , _RELAY3, _VE_BLOCK, _VE_START_STOP
 #define D7_IS_NONE        // _NONE , _RELAY4; _VICTRON
-#define OLED_IS_128x64    // _NONE , _64x48 , _128x64
+#define OLED_IS_64x48     // _NONE , _64x48 , _128x64
 #define OLED_IS_REVERSED  // _IS_NORMAL, _IS_REVERSED To turn the display 180° if required
 #define INA_IS_226        // _NONE , _226
+#define INA_VBUS_IS_HALF  // _FULL _HALF   (when high voltage schematic is used)
 //#include "MPPT_75_15.h"
 #include "SHUNT_10A_75mV.h" 
 #include "LiFePo_13V_100Ah.h"

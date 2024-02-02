@@ -41,8 +41,17 @@
 
 *  after Serial.swap()
 
-Feed the Witty ESP8266 or Wemos D1 over a 12V / 5V micro buck converter
+Feed the Witty ESP8266 or Wemos D1 over a 12V / 5V micro buck converter of appropriate input voltage range.
+
+SThe project is on GitHub: https://github.com/rin67630/Victron_VE_on_Steroids
 
   Get values via Telnet
   telnet <IPADDR>
+
+This software is open-source under creative common license CC BY-SA
+It is given in the hope to be useful, but I am 
+NOT RESPONSIBLE IN ANY WAY OF DAMAGES WAHTSOEVER 
+occuring from the use of my software.
+Be careful, high currents, DC voltages over 24V, Batteries 
+can cause damages to proerty and/or health, even kill you !
 */

@@ -68,7 +68,8 @@ void setup()
   digitalWrite(STDLED, true);
 
 #ifndef OLED_IS_NONE   //Display connection information
-  display.drawString(0, 24, WiFi.localIP().toString());
+  sprintf(charbuff, "IP= ..%03d.%03d", ip[2], ip[3]); display.drawString(0, 24, charbuff);
+  display.drawString(0, 36, "Connected    ");  
   display.display();
   delay(2000);
 #endif
