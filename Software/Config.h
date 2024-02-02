@@ -10,13 +10,13 @@
 #define OLED_IS_REVERSED  // _IS_NORMAL, _IS_REVERSED To turn the display 180° if required
 #define INA_IS_226        // _NONE , _226
 //#include "MPPT_75_15.h"
-#include "SHUNT_1A_25mV.h" 
+#include "SHUNT_10A_75mV.h" 
 #include "LiFePo_13V_100Ah.h"
 
 //----------------------- SOFTWARE OPTIONS ---------------------------------
-#define WEATHER_IS_OWM     // _NONE , _OWM              // (Source of the Weather Information)
+#define WEATHER_IS_OWM  // _NONE , _OWM , _BME680    // (Source of the Weather Information)
 #define DASHBRD_IS_NONE    // _NONE , _THINGER          // (Internet Dashboard)
-#define TERM_IS_TELNET    // _NONE , _TELNET, _SERIAL , _SOFTSER // where do Menus and Reports occur: _SERIAL and D7_IS_VICTRON mutually exclusive )
+#define TERM_IS_TELNET     // _NONE , _TELNET, _SERIAL , _SOFTSER // where do Menus and Reports occur: _SERIAL and D7_IS_VICTRON mutually exclusive )
 #define UDP_IS_NONE        // _NONE , _SEND , _RECEIVE  // (UDP Inter-ESP Communication)
 #define COM_IS_NONE        // _NONE , _MIDNIGHT         // Periodical reports to computer
 #define ESP_UDP_ADDR   "192.168.188.64"                  // (IP of the receiving ESP) 

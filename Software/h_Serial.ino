@@ -65,7 +65,7 @@ void serialRun()
       break;
 
     case 'W':   // Weather Plot
-      Console1.printf("Temp: %2.1f°C Hum: %2.1f%% Press: %4.0fmBAR WindSpeed: %2.1fm/s Direction: %u°N Clouds: %u%% Summary: ", outdoor_temperature, outdoor_humidity, outdoor_pressure, wind_speed, wind_direction, cloudiness);
+      Console1.printf("Temp: %2.1f°C Hum: %2.1f%% Press: %4.0fmBAR WindSpeed: %2.1fm/s Direction: %u°N Clouds: %u%% Summary: ", temperature, humidity, pressure, wind_speed, wind_direction, cloudiness);
       Console1.println(weather_summary);
       serialPage = ' ';
       break;

@@ -53,8 +53,8 @@ void statsRun()
     BatVavg[30] = BatVavg[29];
   }
 
- #if defined (DASHBRD_IS_THINGER)
-// ***  Persistancy ***  (requested to survive reset)
+#if defined (DASHBRD_IS_THINGER)
+  // ***  Persistancy ***  (requested to survive reset)
 
   if (Minute % 10 == 2 && Second == 10)                      // call every 10 minutes
   {
@@ -66,9 +66,9 @@ void statsRun()
     persistance["Ah/hour"]       = BatAh[25];
     persistance["Ah/yesterday"]  = BatAh[27];
 
-    persistance["temperature"]   = outdoor_temperature;
-    persistance["humidity"]      = outdoor_humidity;
-    persistance["pressure"]      = outdoor_pressure;
+    persistance["temperature"]   = temperature;
+    persistance["humidity"]      = humidity;
+    persistance["pressure"]      = pressure;
     persistance["wind"]          = wind_speed;
     persistance["direction"]     = wind_direction;
     persistance["cloudiness"]    = cloudiness;
@@ -159,9 +159,9 @@ void statsRun()
         auto error = deserializeJson(doc, JSONpayload.c_str());
         if ( not error)
         {
-          outdoor_temperature  = doc["main"]["temp"];
-          outdoor_pressure     = doc["main"]["pressure"];
-          outdoor_humidity     = doc["main"]["humidity"];
+          temperature  = doc["main"]["temp"];
+          pressure     = doc["main"]["pressure"];
+          humidity     = doc["main"]["humidity"];
           wind_speed           = doc["wind"]["speed"];
           wind_direction       = doc["wind"]["deg"];
           cloudiness           = doc["clouds"]["all"];  // % Clouds
@@ -175,5 +175,12 @@ void statsRun()
       http.end();
     }  // End minute %10...
   }  // end Wifi connected
+#endif
+
+#if defined(WEATHER_IS_BME680)
+  bme.performReading(); 
+  temperature = bme.temperature;
+  pressure = bme.pressure / 100;
+  humidity = bme.humidity;
 #endif
 }

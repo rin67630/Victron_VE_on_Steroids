@@ -16,6 +16,19 @@ void setup()
   InfluxDBClient client(INFLUXDB_URL, INFLUXDB_ORG, INFLUXDB_BUCKET, INFLUXDB_TOKEN, InfluxDbCloud2CACert);
 #endif
 
+#if defined(WEATHER_IS_BME680)
+  if (!bme.begin()) 
+  {
+    Serial.println("Could not find a valid BME680 sensor, check wiring!");
+    while (1);
+  }else{ 
+    Serial.println("BME680 sensor starting!");
+  }
+  bme.setTemperatureOversampling(BME680_OS_8X);
+  bme.setHumidityOversampling(BME680_OS_2X);
+  bme.setPressureOversampling(BME680_OS_4X);
+#endif
+
   delay(3000); // Wait for serial monitor to be started
   Serial.begin(SERIAL_SPEED);
   Serial.setRxBufferSize(1024);
@@ -75,7 +88,7 @@ void setup()
   ArduinoOTA.begin();
   delay(500);
 
-  
+
 #ifndef UDP_IS_NONE
   UDP.begin(ESP_UDP_PORT);
   Serial.printf("\nOpening UDP port: %u", ESP_UDP_PORT);
@@ -145,9 +158,9 @@ void setup()
 
   thing["weather"] >> [](pson & out)
   {
-    out["temperature"] = outdoor_temperature;
-    out["humidity"]    = outdoor_humidity;
-    out["pressure"]    = outdoor_pressure;
+    out["temperature"] = temperature;
+    out["humidity"]    = humidity;
+    out["pressure"]    = pressure;
     out["wind"]        = wind_speed;
     out["direction"]   = wind_direction;
     out["cloudiness"]  = cloudiness;
@@ -221,9 +234,9 @@ void setup()
     out["BatAh"] = BatAh[25];
     out["percent_charged"] = payload.ChSt;
 
-    out["temperature"]  = outdoor_temperature;
-    out["humidity"]     = outdoor_humidity;
-    out["pressure"]     = outdoor_pressure;
+    out["temperature"]  = temperature;
+    out["humidity"]     = humidity;
+    out["pressure"]     = pressure;
     out["wind"]         = wind_speed;
     out["direction"]    = wind_direction;
     out["summary"]      = weather_summary;
@@ -264,9 +277,9 @@ void setup()
   BatAh[25]           = persistance["Ah/hour"];
   BatAh[27]           = persistance["Ah/yesterday"];
 #endif
-  outdoor_temperature = persistance["temperature"];
-  outdoor_humidity    = persistance["humidity"];
-  outdoor_pressure    = persistance["pressure"];
+  temperature = persistance["temperature"];
+  humidity    = persistance["humidity"];
+  pressure    = persistance["pressure"];
   wind_speed          = persistance["wind"];
   wind_direction      = persistance["direction"];
 

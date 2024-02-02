@@ -1,7 +1,19 @@
 void menuRun()
 {
-  switch (Console1.read())
+
+  serialReceived = Console1.read();
+  switch (serialReceived)
   {
+    // Switching displays
+    case '0':    
+    case '1':
+    case '2':
+    Console1.print("Switching display to ") ;
+    Console1.write(serialReceived) ;
+    Console1.println();
+    displayPage = serialReceived ;
+    break;
+            
     case 'Z':   // Reset ESP
       Console1.printf ("\nReset Device, Bye! \n");
 #if defined(TERM_IS_TELNET)
@@ -46,9 +58,10 @@ void menuRun()
       Console1.printf ("\nJob Timing\n");
       serialPage = 'J';
       break;
-    case ' ':  //Wait for input
+    case ' ':  //Wait for input, clear Serial page and Display page
       Console1.printf ("\nWaiting for input\n");
-      serialPage = ' ';
+      serialPage  = serialReceived ;
+      displayPage = serialReceived ;
       break;
     case 'j':  //Reset Job Maxes
       Console1.printf ("\nReset Job Timings \n");

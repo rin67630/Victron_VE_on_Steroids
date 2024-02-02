@@ -31,6 +31,18 @@ SSD1306Wire display(0x3c, SDA, SCL);                  //OLED 128*64 soldered
 INA_Class INA;
 #endif
 
+
+#if defined(WEATHER_IS_BME680)
+#define BME_SCK 13
+#define BME_MISO 12
+#define BME_MOSI 11
+#define BME_CS 10
+#include <Adafruit_Sensor.h>
+#include "Adafruit_BME680.h"
+#define SEALEVELPRESSURE_HPA (1013.25)
+Adafruit_BME680 bme;
+#endif
+
 #ifndef UDP_IS_NONE
 #include <WiFiUdp.h>
 WiFiUDP UDP;
@@ -96,6 +108,7 @@ boolean DayExpiring;
 boolean TrigEvent;
 unsigned int RunMillis[28];  // keep trace of consumed time
 
+byte serialReceived;
 byte serialPage;
 byte displayPage;
 byte displaySubPage;
@@ -184,9 +197,9 @@ float dBatI;  // delta_voltage
 float dBatV;  // delta_current
 
 // ***Weather***
-float outdoor_temperature;
-float outdoor_humidity;
-float outdoor_pressure;
+float temperature;
+float humidity;
+float pressure;
 float wind_speed;
 int   wind_direction;
 int   cloudiness;
