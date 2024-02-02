@@ -17,4 +17,6 @@ I prints the Victron Internal representation of the transmitted information
 J *prints a Job report showing how many mS every task takes*   
 j resets the max counter for every job 
 
+0..2 changes the display content.
+
 more commands will come.
