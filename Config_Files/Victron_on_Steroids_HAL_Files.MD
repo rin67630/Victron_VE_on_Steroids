@@ -3,7 +3,7 @@ Victron-on-Steroids_HAL_Files
 (Hardware Abstraction Layer)
 
 These files are used to adapt different hardware configurations to the common Victron-on-Steroids software.
-The complete Victron-on-Steroids_HAL_Files folder must be placed in the Arduino IDE libraries folder
+The complete Victron-on-Steroids_HAL_Files folder must be placed in __the Arduino IDE libraries__ folder
 
 Victron-on-Steroids is designed in a flexible way in order to support different hardware components:
 
@@ -16,14 +16,15 @@ Victron-on-Steroids is designed in a flexible way in order to support different 
 etc.
 
 *** Victron Smart shunts ***
-- VSS_500.h
+- VSS_500.h  (not yet implemented, lacking device to test)
 
 *** Dumb shunts ***
 - 10A_75mV.h
 - 30A_75mV.h
 - 50A_75mV.h
 - 200A_50mV.h
-- 500A_50mV.h
+- 500A_50mV.h 
+etc.
 
 *** ESP development boards ***
 The development board files mainly contain the input output definitions. You should normally not change that content unless you know what you're doing.
