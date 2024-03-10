@@ -42,7 +42,8 @@ https://github.com/rin67630/Drok-Juntek-on-steroids
 (you can have a look there to see the dashboards and onboard screens)  
 I can re-use a lot of code from this project on Victron-on Steroids.  
 The current default Thinger Screen looks like that:   
-<img width="692" alt="ScreenshotThinger2" src="https://github.com/rin67630/Victron_VE_on_Steroids/assets/14197155/eabfac81-ddef-4716-9c72-76964eef21ea">
+![grafik](https://github.com/rin67630/Victron_VE_on_Steroids/assets/14197155/306c172f-6d3d-4fdd-a3c0-9738d9368115)
+
 
 But everyone is free to design his own dashboard online !
 
