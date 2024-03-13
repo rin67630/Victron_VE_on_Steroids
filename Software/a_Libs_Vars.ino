@@ -1,29 +1,79 @@
+//*** Convenience macro for Timing ***
+#define runEvery(t) for (static uint16_t _lasttime; (uint16_t)((uint16_t)millis() - _lasttime) >= (t); _lasttime += (t))  // Macro for Timing
+
 //*** Include Configuration files ***
 #include "Credentials.h"
 #include "Config.h"
 
-//*** Convenience macro for Timing ***
-#define runEvery(t) for (static uint16_t _lasttime; (uint16_t)((uint16_t)millis() - _lasttime) >= (t); _lasttime += (t))  // Macro for Timing
-
-// *** Libraries and instanciations***
-#include <Wire.h> 
-#include <ESP8266WiFi.h>
-WiFiClient WifiClient;
-#include <ESP8266HTTPClient.h>
-//HTTPClient http;
+// *** Libraries ***
+#include <Wire.h>
 #include <time.h>
-#include <sntp.h>
-#include <TZ.h>
 #include <ArduinoOTA.h>
+#include "time.h"  // built-in
+#include <EEPROM.h>
 
-#ifndef OLED_IS_NONE
-#include "SSD1306Wire.h"  // from https://github.com/ThingPulse/esp8266-oled-ssd1306/
+// *** Optional libraries ***
+/* deprecated
+#if defined(D7_IS_VICTRON) && not defined(CONTR_IS_ESP8266)
+#include <HardwareSerial.h>
+HardwareSerial SerialPort(2); // use UART2
 #endif
-#ifdef OLED_IS_64x48
-SSD1306Wire display(0x3c, SDA, SCL, GEOMETRY_64_48 ); // WEMOS OLED 64*48 shield
+*/
+
+#ifdef CONTR_IS_ESP8266
+#define STDLED BLULED
+#include <ESP8266WiFi.h>
+#include <ESP8266HTTPClient.h>
+#else  // ES32, HELTEC, TTGO
+#include <WiFi.h>
+#include <HTTPClient.h>
 #endif
-#ifdef OLED_IS_128x64
-SSD1306Wire display(0x3c, SDA, SCL);                  //OLED 128*64 soldered
+
+#ifdef SCREEN_IS_64x48
+#include <SSD1306.h>                              // from https://github.com/ThingPulse/esp8266-oled-ssd1306/
+SSD1306 display(0x3c, SDA, SCL, GEOMETRY_64_48);  // WEMOS OLED 64*48 shield
+#endif
+
+#ifdef SCREEN_IS_128x64
+#include <SSD1306.h>              // from https://github.com/ThingPulse/esp8266-oled-ssd1306/
+SSD1306 display(0x3c, SDA, SCL, GEOMETRY_128_64);  //OLED 128*64 soldered
+#endif
+
+#ifdef SCREEN_IS_WEMOS32
+#define SDA 5
+#define SCL 4
+#define RST 16
+#include <SSD1306.h>
+SSD1306 display(0x3c);
+#endif
+
+#ifdef SCREEN_IS_HELTEC
+#define SDA 4
+#define SCL 15
+#define RST 16
+#include <SSD1306.h>  
+SSD1306 display(0x3c);  //cut: , SDA, SCL, GEOMETRY_128_64, RST)
+#endif
+
+#ifdef SCREEN_IS_TTGO
+#include <TFT_eSPI.h>
+#include <SPI.h>
+#include <MoToButtons.h>    // from Library (MoBaTools).
+TFT_eSPI tft = TFT_eSPI();  // Invoke custom library
+#define STDLED 2
+#define REDLED 15
+#define GRNLED 13
+#define BLULED 12
+#define A0 36
+#define BUTTON_UP 35
+#define BUTTON_DOWN 0
+#define TOUCH_CS 21
+#define ROTARY_ENCODER_A_PIN 25       // Rotary Encoder A
+#define ROTARY_ENCODER_B_PIN 26       // Rotary Encoder B
+#define ROTARY_ENCODER_BUTTON_PIN 33  // Rotary Encoder Switch
+#define ROTARY_ENCODER_STEPS 4        // Rotary Encoder Delta (Steps) not an input!
+#define TFT_GREY 0x5AEB               // better Grey
+#define TFT_VERMILON 0xFA60           // better Orange
 #endif
 
 #ifndef INA_IS_NONE
@@ -31,30 +81,26 @@ SSD1306Wire display(0x3c, SDA, SCL);                  //OLED 128*64 soldered
 INA_Class INA;
 #endif
 
-
-#if defined(WEATHER_IS_BME680)
-#define BME_SCK 13
-#define BME_MISO 12
-#define BME_MOSI 11
-#define BME_CS 10
-#include <Adafruit_Sensor.h>
-#include "Adafruit_BME680.h"
-#define SEALEVELPRESSURE_HPA (1013.25)
-Adafruit_BME680 bme;
-#endif
-
 #ifndef UDP_IS_NONE
 #include <WiFiUdp.h>
 WiFiUDP UDP;
+#define UDP_TX_PACKET_MAX_SIZE 128  //increase UDP size
 #endif
 
 #ifdef WEATHER_IS_OWM
 #include <ArduinoJson.h>  // Libs for Webscraping
-#define OPEN_WEATHER_MAP_URL  "http://api.openweathermap.org/data/2.5/weather?id=" OPEN_WEATHER_MAP_LOCATION_ID "&appid=" OPEN_WEATHER_MAP_APP_ID "&units=" OPEN_WEATHER_MAP_UNITS "&lang="  OPEN_WEATHER_MAP_LANGUAGE
+#define OPEN_WEATHER_MAP_URL "http://api.openweathermap.org/data/2.5/weather?id=" OPEN_WEATHER_MAP_LOCATION_ID "&appid=" OPEN_WEATHER_MAP_APP_ID "&units=" OPEN_WEATHER_MAP_UNITS "&lang=" OPEN_WEATHER_MAP_LANGUAGE
+WiFiClient WifiClient;
 #endif
 
 #if defined(DASHBRD_IS_THINGER)
+#if defined(CONTR_IS_ESP8266)
 #include <ThingerESP8266.h>
+ThingerESP8266 thing(THINGER_USERNAME, THINGER_DEVICE, THINGER_DEVICE_CREDENTIALS);
+#else
+#include <ThingerESP32.h>
+ThingerESP32 thing(THINGER_USERNAME, THINGER_DEVICE, THINGER_DEVICE_CREDENTIALS);
+#endif
 //#include <ThingerConsole.h>
 #endif
 
@@ -77,11 +123,29 @@ WiFiUDP UDP;
 #define Console1 TelnetStream
 #endif
 
+#ifndef SCREEN_IS_NONE
+#include "SSD1306Wire.h"  // from https://github.com/ThingPulse/esp8266-oled-ssd1306/
+#endif
+
+// *** Instanciations ***
+
+// Parameters for MoToButtons
+#ifdef CONTR_IS_TTGO
+#define MAX8BUTTONS  // This saves ressources if you don't need more than 8 buttons
+const byte buttonPins[] = { BUTTON_UP, BUTTON_DOWN, ROTARY_ENCODER_BUTTON_PIN };
+enum : byte { UP,
+              DOWN,
+              ROT };
+const byte buttonCount = sizeof(buttonPins);
+MoToButtons Buttons(buttonPins, buttonCount, 130, 5000);  //  130ms debounce. 5 s to distinguish short/long
+#endif
 
 //***Variables for Time***
-tm* timeinfo;  //localtime returns a pointer to a tm struct static int Second;
-time_t Epoch;
+tm* timeinfo;  //localtime returns a pointer to a tm struct static int by Second;
+tm* offsettedTimeinfo;
 time_t now;
+time_t offsettedNow;
+time_t Epoch;
 byte Second;
 long SecondOfDay;
 long MillisMem;
@@ -119,7 +183,7 @@ static IPAddress ip;
 //*** Buffers ***
 static char charbuff[120];  //Char buffer for many functions
 
-#if defined(D7_IS_VICTRON) 
+#if defined(D7_IS_VICTRON)
 //***Variables for Victron***
 char receivedChars[buffsize];                        // an array to store the received data
 char tempChars[buffsize];                            // an array to manipulate the received data
@@ -131,30 +195,47 @@ bool new_data = false;
 bool blockend = false;
 #endif
 
+//***Parameters Battery
+#ifdef TYPE_IS_LIION
+int CHA[10] = { 324, 336, 348, 3602, 372, 384, 396, 408, 420, 430 };
+int DIS[10] = { 300, 324, 336, 348, 3602, 372, 384, 396, 408, 420 };
+#endif
+
+#ifdef TYPE_IS_LIFEPO
+int CHA[10] = { 300, 315, 322, 325, 327, 330, 332, 335, 340, 365 };
+int DIS[10] = { 280, 300, 315, 322, 325, 327, 330, 332, 335, 340 };
+#endif
+
+#ifdef TYPE_IS_LEAD
+int CHA[10] = { 198, 201, 203, 205, 207, 208, 212, 218, 225, 238 };
+int DIS[10] = { 175, 189, 196, 198, 201, 203, 205, 207, 208, 212 };
+#endif
+
+
 
 struct payload {
-  byte  DevNr = DEVICE_NUMBER;  // Device number 1..4 when using an ESP32 supervisor.
+  byte DevNr = DEVICE_NUMBER;  // Device number 1..4 when using an ESP32 supervisor.
   //***Operating Values from Victron/SmartShunt***
-  float BatV;  // V   Battery voltage, V
-  float BatV1; // V   Battery voltage, V  (Double or half Voltage)
-  float BatI;  // I   Battery current, A
-  float BatW;  //  BatV*BatI
+  float BatV;   // V   Battery voltage, V
+  float BatV1;  // V   Battery voltage, V  (Double or half Voltage)
+  float BatI;   // I   Battery current, A
+  float BatW;   //  BatV*BatI
 
   float PanV;  // VPV Panel voltage,   V
   float PanI;  // PanW/PanV
   float PanW;  // PPV Panel power,     W
 
   float LodI;  // IL  Load Current     A
-  float LodW;  //  LodI*BatV
+  float LodW;  //  BatI*BatV
   float IOhm;  //  dV / dI
 
-  int ChSt;    // CS  Charge state, 0 to 9
-  int Err;     // ERR Error code, 0 to 119
+  int ChSt;       // CS  Charge state, 0 to 9
+  int Err;        // ERR Error code, 0 to 119
   boolean LodOn;  // LOAD ON Load output state, ON/OFF
 } payload;
 
 char UDPCharPayload[sizeof(payload)];  //  Array of characters as image of the structure for UDP xmit/rcv
-String  JSONpayload;
+String JSONpayload;
 
 //***Operating Values Integrated from Victron***
 float TotKWh;  // H19 Yield total, kWh
@@ -179,11 +260,11 @@ float BatMV;  //  Number of Deep Discharges
 float BatOV;  //  Number of Overvoltages
 
 //*** Hourly integrated Values
-float BatAh[26];    //  Ah of the current hour
-//float BatWh[26];  //  Wh of the current hour
-float BatVavg[26];  //  Avg voltage in hour
+float BatAh[31];  //  Ah of the current hour
+//float BatWh[31];  //  Wh of the current hour
+float BatVavg[31];  //  Avg voltage in hour
 float currentInt;   //  Averaging bucket for hourly stats
-long  nCurrent;     //  Counter for averaging
+long nCurrent;      //  Counter for averaging
 
 time_t LastFloat;  //  Time of last float
 time_t LastVMin;   //  Time of minimum Voltage
@@ -201,12 +282,12 @@ float temperature;
 float humidity;
 float pressure;
 float wind_speed;
-int   wind_direction;
-int   cloudiness;
+int wind_direction;
+int cloudiness;
 String weather_summary;
 
 #ifndef INA_IS_NONE
-byte devicesFound =      0; 
+byte devicesFound = 0;
 float ina1_voltage;
 float ina1_current;
 float ina1_shunt;

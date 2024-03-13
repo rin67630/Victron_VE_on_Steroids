@@ -2,16 +2,19 @@ void wirelessRun()
 {
 
 #if defined (DASHBRD_IS_THINGER)
-    if (TrigEvent)   {  thing.write_bucket("EVENT", "EVENT"); TrigEvent = false; }
-    if (NewDay)         thing.write_bucket("DAY", "DAY");
-    if (HourExpiring)   thing.write_bucket("HOUR", "HOUR");
-    if (MinuteExpiring) thing.write_bucket("MIN", "MIN");  
-#endif 
+  if (TrigEvent)   {
+    thing.write_bucket("EVENT", "EVENT");
+    TrigEvent = false;
+  }
+  if (NewDay)         thing.write_bucket("DAY", "DAY");
+  if (HourExpiring)   thing.write_bucket("HOUR", "HOUR");
+  if (MinuteExpiring) thing.write_bucket("MIN", "MIN");
+#endif
 
   if (SecondOfDay == 39000)  //Somewehere during the middle of the day, resync time
   {
-getNTP();
-getTimeData();
+    getNTP();
+    getTimeData();
   }
   /*
      ***   UDP Communication  ***
@@ -44,44 +47,19 @@ getTimeData();
   }
 #endif
 
-#ifdef COM_IS_MIDNIGHT
-  if (SecondOfDay == 86398)  //Just before end of day
+#ifdef COM_IS_HOURLY
+  if (NewHour)  //Just before end of day
   {
-    UDP.beginPacket(COM_UDP_ADDR, COM_UDP_PORT);
-    sprintf(charbuff, " \nMidnight Report for yesterday of \n%s, %02d %s %04d ", DayName , Day , MonthName, Year);
+    offsettedNow = now - 3600;  //One hour back.
+    offsettedTimeinfo = localtime(&offsettedNow);
+    strftime(charbuff, 30, "%x ", offsettedTimeinfo);
+    UDP.println();
     UDP.print(charbuff);
-    UDP.print  ("\n Hour   |");
-    for  (byte n = 0; n < 12; n++)
-    {
-      UDP.printf("   %02u   |", n);
-    }
-    UDP.print  ("\n Bat Ah |");
-    for  (byte n = 0; n < 12; n++)
-    {
-      UDP.printf(" %+02.3f |", BatAh[n]);
-    }
-    UDP.print  ("\n Bat V  |");
-    for  (byte n = 0; n < 12; n++)
-    {
-      UDP.printf(" %+02.3f |", BatVavg[n]);
-    }
-    UDP.print  ("\n Hour   |");
-    for  (byte n = 12; n < 24; n++)
-    {
-      UDP.printf("   %02u   |", n);
-    }
-    UDP.print  ("\n Bat Ah |");
-    for  (byte n = 12; n < 24; n++)
-    {
-      UDP.printf(" %+02.3f |", BatAh[n]);
-    }
-    UDP.print  ("\n Bat V  |");
-    for  (byte n = 12; n < 24; n++)
-    {
-      UDP.printf(" %+02.2f |", BatVavg[n]);
-    }
-    UDP.println("");
-  } // end second of Day
-#endif //COM_IS_MIDNIGHT
+    n = Hour - 1 ;
+    if (Hour == -1) n = 23 ;
+    UDP.printf("\n %+02.3f | %+02.3f | %s ", BatAh[n], BatVavg[n]), weather_summary;
+  }
+} // end second of Day
+#endif //COM_IS_HOURLY
 
 } // End wirelessRun()

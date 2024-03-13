@@ -1,95 +1,61 @@
 #define runEvery(t) for (static uint16_t _lasttime; \
                          (uint16_t)((uint16_t)millis() - _lasttime) >= (t); \
                          _lasttime += (t))
-
-void getWiFi()  // From memory , Using Defaults, or using SmartConfig
+void getWiFi() 
 {
   int retry = 0;
   WiFi.mode(WIFI_STA);  // configure WiFi in Station Mode
+  Serial.printf("Connecting to %s from Flash ", WIFI_SSID);
+
+  #ifdef CONTR_IS_ESP8266
   wifi_station_set_hostname(DEVICE_NAME);
   wifi_station_set_auto_connect(true);
-  delay(WIFI_REPEAT);
-  Serial.println("Attempt to connect to WiFi network from EEPROM");
+  #else
+  WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE, INADDR_NONE);
+  WiFi.setHostname(DEVICE_NAME);
+  WiFi.reconnect();
+  #endif
+
   WiFi.begin();
   delay(WIFI_REPEAT);
-  while (WiFi.status() != WL_CONNECTED) 
-  {
-    Serial.print(".");
-    digitalWrite(STDLED, not digitalRead(STDLED));
-    delay(WIFI_REPEAT);
-    if (retry++ >= WIFI_MAXTRIES) break;
-  }
-
-  if (WiFi.status() != WL_CONNECTED) 
-  {
-    Serial.println("\nConnection timeout expired! Start with default");
-    retry = 0;
+  if (WiFi.status() != WL_CONNECTED) {
+    Serial.print("failed, try from Credentials");
     WiFi.begin(WIFI_SSID, WIFI_PASS);
-    delay(WIFI_REPEAT * 2);
+    byte wifiConnectCounter = 1;
+    Serial.println();
     while (WiFi.status() != WL_CONNECTED) {
-      Serial.print(".");
-      digitalWrite(STDLED, not digitalRead(STDLED));
       delay(WIFI_REPEAT);
-      if (retry++ >= WIFI_MAXTRIES) break;
-    }
-  }
-  if (WiFi.status() != WL_CONNECTED) 
-  {
-    Serial.println("Connection timeout expired! Start SmartConfig…");
-    retry = 0;
-    WiFi.beginSmartConfig();
-    digitalWrite(STDLED, false);
-    while (WiFi.status() != WL_CONNECTED) {
       Serial.print(".");
-      digitalWrite(STDLED, not digitalRead(STDLED));
-      delay(WIFI_REPEAT * 4);
-      if (retry++ >= WIFI_MAXTRIES) break;
-      if (WiFi.smartConfigDone()) {
-        Serial.println("SmartConfig success!");
-        break;  // exit from loop
+      wifiConnectCounter++;
+      if (wifiConnectCounter > WIFI_MAXTRIES) {
+        Serial.printf("\n\nBad SSID or PASS?\n");
+        WiFi.disconnect();
+        Serial.printf("Running offline, enter date & time (dd/mm/yyyy hh:mm:ss)\n");
+        break;
       }
     }
+    delay(50);
   }
-
-
-  if (WiFi.status() != WL_CONNECTED) 
-  {
-    Serial.println("Connection timeout expired! Running without Network");
-    WiFi.mode(WIFI_OFF);
-  } else {
-    ip = WiFi.localIP();
-    wifi_station_set_auto_connect(true);
-    Serial.println("Connection succeeded");
-    digitalWrite(STDLED, true);   
-  }
-}  // End Void GetWiFi
-
-void disConnect() 
-{
-  //  WiFi.disconnect(); //temporarily disconnect WiFi as it's no longer needed
-  WiFi.mode(WIFI_OFF);
-  // WiFi.forceSleepBegin();  can it save power?
-  // WiFi.forceSleepWake();
+  ip = WiFi.localIP();
+  Serial.print("Done: RRSI= ");   Serial.print(WiFi.RSSI());
+  sprintf(charbuff, "dB, IP= %03d . %03d . %03d . %03d \n", ip[0], ip[1], ip[2], ip[3]);   Serial.printf(charbuff);
 }
 
-void getNTP() 
-{
-  if (WiFi.status() == WL_CONNECTED) {
-    configTime(MYTZ, NTP_SERVER);
-    now = 1577833200000;  //01 Jan 2020 12:00
-  }
+void myIP() {
+  sprintf(charbuff, "IP= %03d.%03d.%03d.%03d\n", ip[0], ip[1], ip[2], ip[3]);
+}
+
+//********* Time management*************
+
+void getNTP() {
+  configTime(GMT_OFFSET_SEC, DAYLIGHT_OFFSET_SEC, NTP_SERVER);
+}
+void getEpoch() {
   now = time(nullptr);
   Epoch = now;
 }
 
-void getEpoch() 
-{
-  now = time(nullptr);
-  Epoch = now;
-}
-
-void getTimeData() 
-{
+void getTimeData() {
   timeinfo = localtime(&now);  // cf: https://www.cplusplus.com/reference/ctime/localtime/
   Second = timeinfo->tm_sec;
   Minute = timeinfo->tm_min;
@@ -97,28 +63,65 @@ void getTimeData()
   Weekday = timeinfo->tm_wday + 1;
   Day = timeinfo->tm_mday;
   Month = timeinfo->tm_mon + 1;
-  Year = timeinfo->tm_year + 1900;  //returns years since 1900
-
+  Year = timeinfo->tm_year + 1900;        //returns years since 1900
   strftime(DayName, 12, "%A", timeinfo);  //cf: https://www.cplusplus.com/reference/ctime/strftime/
   strftime(MonthName, 12, "%B", timeinfo);
   strftime(Time, 10, "%T", timeinfo);
   strftime(Date, 12, "%d/%m/%Y", timeinfo);
 }
 
-void buffTimeData()
+void buffTimeData()  // writes the time/date in Charbuff for print or display
 {
-  strftime(charbuff, sizeof(charbuff), "%R %x", timeinfo);
+  strftime(charbuff, sizeof(charbuff), " %R %d%b ", timeinfo);
 }
 
-void initOTA() 
+//*** Other Math / conversions ***
+bool inRange(int x, int low, int high)  // checks if a value is in boundaries
 {
-  if (WiFi.status() == WL_CONNECTED) 
-  {
+  if (x >= low && x <= high)
+    return true;
+  return false;
+}
+
+void setTimefromSerial()  // Enter time over serial
+{
+  if (Serial.available() > 0) {
+    // read in the user input
+    Day = Serial.parseInt();
+    Month = Serial.parseInt();
+    Year = Serial.parseInt();
+    Hour = Serial.parseInt();
+    Minute = Serial.parseInt();
+    Second = Serial.parseInt();
+    boolean validDate = (inRange(Day, 1, 31) && inRange(Month, 1, 12) && inRange(Year, 2021, 2031));
+    boolean validTime = (inRange(Hour, 0, 23) && inRange(Minute, 0, 59) && inRange(Second, 0, 59));
+    if (validTime && validDate) {
+      configTime(0, 0, "pool.ntp.org");  // Repair timezone
+      setenv("TZ", "CET-1CEST,M3.5.0,M10.5.0/3", 3);
+      tzset();
+      struct tm t;  //Prepare time strucure
+      time_t t_of_day;
+      t.tm_year = Year - 1900;  // Year - 1900
+      t.tm_mon = Month - 1;     // Month, where 0 = jan
+      t.tm_mday = Day;          // Day of the month
+      t.tm_hour = Hour;
+      t.tm_min = Minute;
+      t.tm_sec = Second;
+      t.tm_isdst = -1;  // Is DST on? 1 = yes, 0 = no, -1 = unknown
+      t_of_day = mktime(&t);
+      struct timeval tv;     //Extending to mandatory microseconds
+      tv.tv_sec = t_of_day;  // epoch time (seconds)
+      tv.tv_usec = 0;        // microseconds
+      settimeofday(&tv, 0);  //Setting Clock
+    }
+  }
+}
+void initOTA() {
+  if (WiFi.status() == WL_CONNECTED) {
     // Over the Air Framework
     ArduinoOTA.onStart([]() {
       String type;
-      if (ArduinoOTA.getCommand() == U_FLASH) 
-      {
+      if (ArduinoOTA.getCommand() == U_FLASH) {
         type = "sketch";
       } else {  // U_FS
         type = "filesystem";
@@ -146,5 +149,8 @@ void initOTA()
         Serial.printf("End Failed\n");
       }
     });
+    ArduinoOTA.setHostname(DEVICE_NAME);
+
+    ArduinoOTA.begin();
   }
 }

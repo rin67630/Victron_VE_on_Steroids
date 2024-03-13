@@ -1,45 +1,51 @@
-
+// N.B. Compile sketch with following board settings: 
+//- for option 8266:           LolinWEMOSD1 (Clone)     
+//- for option TTGO:           TTGO T1 
+//- for option HELTEC LoRa:    HELTEC WiFi Lora32  (Not V2 !) from HELTEC, not generic
 //----------------------- HARDWARE OPTIONS ---------------------------------
+#define CONTR_IS_ESP8266    //_IS_HELTEC, _IS_TTGO, _IS_ESP8266, _IS_ESP32;                     Choice of ESP controller boards
+#define SCREEN_IS_128x64 // _NONE , _64x48 , _128x64, _TTG0, _HELTEC, _WEMOS32 ; 
+#define SCREEN_IS_NORMAL// _IS_NORMAL, _IS_REVERSED To turn the display 180° if required
+#define BRIGHTNESS  255   // PWM value for default brightness with TTGO 0=totally dark;255=totally shiny
+
 #define AO_IS_NONE        // _NONE , _DOUBLEBATTERY , _HALFBATTERY, _PANEL, _POT
 #define A0_MAX       15   // if A0 is used, define the voltage of the full range measure
 #define D0_IS_NONE        // _NONE , _RELAY1
 #define D5_IS_NONE        // _NONE , _RELAY2
 #define D6_IS_NONE        // _NONE , _RELAY3, _VE_BLOCK, _VE_START_STOP
 #define D7_IS_VICTRON        // _NONE , _RELAY4; _VICTRON
-#define OLED_IS_64x48     // _NONE , _64x48 , _128x64
-#define OLED_IS_REVERSED  // _IS_NORMAL, _IS_REVERSED To turn the display 180° if required
-#define INA_IS_NONE       // _NONE , _226 
-#define INA_VBUS_IS_HALF  // _FULL _HALF   (only when high voltage schematic is used, irrelevant else)
-#include "MPPT_75_15.h"      // Put here the file corresponding to your used Victron module (irrelvant else)
-#include "SHUNT_10A_75mV.h"  // Put here the file corresponding to your used Shunt
+#include "MPPT_75_15.h"   // Type of Victron controller (only relevant if D7_IS_VICTRON)
+#define INA_IS_226       // _NONE , _226
+#include "SHUNT_10A_75mV.h" // Shunt Characteristics    (only relevant if INA_IS_226)
+#define INA_VBUS_IS_FULL  // _FULL _HALF   (when high voltage schematic is used)
+#define NUMBER_CELLS      4     // Number of cell in battery
+#define AH_CELLS          100   // AH of the battery
+#define TYPE_IS_LIFEPO    // _LIFPO, _LEAD, _LIION  Type of chemistry used
+#define POC_IS_TABLE      // _TABLE, _VICTRON   defines if POC is estmated from a table or comes from Victron
 
 //----------------------- SOFTWARE OPTIONS ---------------------------------
-#define WEATHER_IS_OWM  // _NONE , _OWM , _BME680    // (Source of the Weather Information)
-#define DASHBRD_IS_NONE    // _NONE , _THINGER          // (Internet Dashboard)
-#define TERM_IS_TELNET     // _NONE , _TELNET, _SERIAL , _SOFTSER // where do Menus and Reports occur: _SERIAL and D7_IS_VICTRON mutually exclusive )
-#define UDP_IS_NONE        // _NONE , _SEND , _RECEIVE  // (UDP Inter-ESP Communication)
-#define COM_IS_NONE        // _NONE , _MIDNIGHT         // Periodical reports to computer
-#define ESP_UDP_ADDR   "192.168.188.64"                  // (IP of the receiving ESP) 
-#define ESP_UDP_PORT    4200  // (Port used to send/receive Values to other ESP)
-#define COM_UDP_ADDR   "192.168.188.1"                  // (IP of the receiving computer for night reports) 
-#define COM_UDP_PORT    4200                            // (Port used to send/receive Values to other computer) 
-#define DEVICE_NAME    "ESP_LP"                         // Name of the device used as Hostname and at Thinger.io
-#define DEVICE_NUMBER   0                               // 0 if no ESP32 supervisor, else 1..4
+#define WEATHER_IS_BME680     // _NONE , _OWM , _BME680    // (Source of the Weather Information)
+#define DASHBRD_IS_NONE // _NONE , _THINGER             // (Internet Dashboard)
+#define TERM_IS_TELNET     // _NONE , _TELNET, _SERIAL , _SOFTSER, _2SERIAL // defines where do Menus and Reports occur: _SERIAL and D7_IS_VICTRON are mutually exclusive )
+#define UDP_IS_NONE     // _NONE , _SEND , _RECEIVE     // (UDP Inter-ESP Communication)
+#define COM_IS_NONE        // _NONE , _HOURLY           // Periodical reports to computer 
+#define ESP_UDP_ADDR       "192.168.188.41"             // (IP of the receiving ESP having UDP_IS_RECEIVE) 
+#define ESP_UDP_PORT       4200  // (Port used to send/receive Values to other ESP)
+#define COM_UDP_ADDR       "192.168.188.96"             // (IP of the receiving computer for night reports) 
+#define COM_UDP_PORT       4230                         // (Port used to send/receive Values to other computer) 
+#define DEVICE_NAME        "SmartSHT8266"                // Name of the device used as Hostname and at Thinger.io
+#define DEVICE_NUMBER      0                            // 0 if no ESP32 supervisor, else 1..4     (not yet implemented)
 
-//--------------------------- ESP SETUP -------------------------------------
-#define WIFI_REPEAT          500
-#define WIFI_MAXTRIES        20
+//--------------------------- WiFi Options -------------------------------------
+#define WIFI_REPEAT          1000     //mS for retry
+#define WIFI_MAXTRIES        30
 #define WIFI_POWER           7.5
 
 //----------------------DO NOT EDIT until you know what you do -------------
-#define SERIAL_SPEED          19200
-#define LDR        A0
-#define BUTTON     D2    // GPIO04
-#define STDLED     D4    // GPIO02 
-#define REDLED     D8    // GPIO15 (used as TX after Serial.swap,n/a on WemosD1)
-#define GRNLED     D6    // GPIO12
-#define BLULED     D7    // GPIO13 (used as RX after Serial.swap)
-#define RELAY1     D0    // GPIO16 Relay or FET control 1
-#define RELAY2     D5    // GPIO14 Relay or FET control 2
-
-//#define V 3   // generates a conflict with Library/Arduino15/packages/esp8266/hardware/esp8266/3.0.2/tools/sdk/include/bearssl/bearssl_rand.h:205:16: note: in expansion of macro 'V'
+#define SERIAL_SPEED      19200
+#define LDR               A0
+#define RELAY1            16    // D0  Relay or FET control 1
+#define RELAY2            14    // D5  Relay or FET control 2
+#define REDLED            15    // D8
+#define BLULED            13    // D7 <-- Victron
+#define GRNLED            12    // D6

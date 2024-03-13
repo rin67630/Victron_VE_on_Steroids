@@ -1,5 +1,5 @@
-void setup()
-{
+void setup() {
+// Initialize Serial Victron
 #if defined(TERM_IS_SOFTSER)
 #if defined(D7_IS_VICTRON)
   SoftwareSerial SwSerial(1, 3);  // SoftwareSerial goes to the regular Serial ports
@@ -8,126 +8,178 @@ void setup()
 #endif
 #endif
 
-#if defined(DASHBRD_IS_THINGER)
-  ThingerESP8266 thing(THINGER_USERNAME, THINGER_DEVICE, THINGER_DEVICE_CREDENTIALS);
-#endif
-
-#if defined(DASHBRD_IS_INFLUX)
-  InfluxDBClient client(INFLUXDB_URL, INFLUXDB_ORG, INFLUXDB_BUCKET, INFLUXDB_TOKEN, InfluxDbCloud2CACert);
-#endif
-
-#if defined(WEATHER_IS_BME680)
-  if (!bme.begin()) 
-  {
-    Serial.println("Could not find a valid BME680 sensor, check wiring!");
-    while (1);
-  }else{ 
-    Serial.println("BME680 sensor starting!");
-  }
-  bme.setTemperatureOversampling(BME680_OS_8X);
-  bme.setHumidityOversampling(BME680_OS_2X);
-  bme.setPressureOversampling(BME680_OS_4X);
-#endif
-
-  delay(3000); // Wait for serial monitor to be started
+  //Initialize Serial Terminal for Boot
   Serial.begin(SERIAL_SPEED);
   Serial.setRxBufferSize(1024);
+  //Initialize Second Serial for Victron
+#if defined(D7_IS_VICTRON) & not defined(CONTR_IS_ESP8266)
+  Serial2.begin(115200, SERIAL_8N1, 13);  //define Serial input 2 on d7 (GPIO13)
+#endif
   // Serial.setDebugOutput(true);
-  Serial.printf("\n\n\nVictron Logger at work,\nSerial @ %u Baud\n", SERIAL_SPEED);
+  delay(1000);  // Wait for serial monitor to be started
+  Serial.print("\n\n\nCompiled from: ");
+  Serial.println(__FILE__);
+  Serial.print("on ");
+  Serial.print(__DATE__);
+  Serial.print(" at ");
+  Serial.println(__TIME__);
+  Serial.printf("Victron/INA226 Logger at work: %s Serial @ %u Baud\n", DEVICE_NAME, SERIAL_SPEED);
+
+  //Initialize I2C
   Wire.begin(SDA, SCL);
 
-  pinMode(STDLED, OUTPUT);   // Blue LED on the ESP
-  // Witty Color LEDs
-  pinMode(REDLED, INPUT);    // Tx0 after Serial.Swap()
-  pinMode(GRNLED, OUTPUT);   // For debugging
-  pinMode(BLULED, INPUT);    // Rx0 after Serial.Swap()
+  //Restart pin
+#ifdef RST
+  pinMode(16, OUTPUT);
+  digitalWrite(16, LOW);
+  delay(10);
+  digitalWrite(16, HIGH);
+#endif
 
-#ifndef OLED_IS_NONE
-  // Initialising the UI will init the display too.
+#ifdef SCREEN_IS_TTGO
+  pinMode(BUTTON_UP, INPUT_PULLUP);
+  pinMode(BUTTON_DOWN, INPUT_PULLUP);
+  pinMode(16, OUTPUT);       //I2C Restart
+  ledcSetup(1, 2000, 8);     // 11 bit resolution@ 2Khz
+  ledcAttachPin(TFT_BL, 1);  // Display backlight control pin
+  ledcWrite(1, BRIGHTNESS);
+  tft.init();  // TTGO e_SPI TFT 240*135 pixel
+  tft.setCursor(0, 0, 2);
+  tft.fillScreen(TFT_BLACK);
+  delay(50);
+#ifdef SCREEN_IS_REVERSED
+  tft.setRotation(1);
+#endif
+  pinMode(BUTTON_UP, INPUT_PULLUP);
+  pinMode(BUTTON_DOWN, INPUT_PULLUP);
+#else
+  //Initialize OLED Screens
   display.init();
-  delay(1000);
-#ifdef OLED_IS_REVERSED
+  //  display.clear();
+  display.setColor(WHITE);
+  display.setTextAlignment(TEXT_ALIGN_LEFT);
+  display.setFont(ArialMT_Plain_10);
+#ifdef SCREEN_IS_REVERSED
   display.flipScreenVertically();
 #endif
-  display.clear();
-  delay(50);
-  display.setFont(ArialMT_Plain_10);
-  display.setTextAlignment(TEXT_ALIGN_LEFT);
-  display.drawString(0, 0,  DEVICE_NAME);
+#endif
+
+  pinMode(REDLED, INPUT);   // Tx0 after Serial.Swap()
+  pinMode(GRNLED, OUTPUT);  // For debugging
+#ifdef D7_IS_VICTRON
+  pinMode(BLULED, INPUT);   // Rx0 after Serial.Swap()
+#else
+  pinMode(BLULED, OUTPUT);  // Use normally
+#endif
+
+#if defined(SCREEN_IS_64x48) | defined(SCREEN_IS_128x64) | defined(SCREEN_IS_WEMOS32)
+  // Initialising the UI will init the display too.
+  display.drawString(0, 0, DEVICE_NAME);
   display.drawString(0, 12, "Try connect..");
   display.display();
 #endif
 
+#ifdef SCREEN_IS_HELTEC
+  display.drawString(0, 0, "Device Name: ");
+  display.drawString(64, 0, DEVICE_NAME);
+  display.drawString(0, 12, "Try connect ");
+  display.display();
+#endif
+
+#ifdef SCREEN_IS_TTGO
+  tft.print("Device Name: ");
+  tft.println(DEVICE_NAME);
+  tft.println("Try connect...  ");
+#endif
+
   // Networking and Time
   getWiFi();
-  //WiFi.printDiag(Serial);
-  // show the IP address assigned to our device
-  Serial.print("IP  address: ");
-  Serial.println(WiFi.localIP());
-  Serial.printf("MAC address: %s , \nHostname: %s", WiFi.macAddress().c_str(), WiFi.hostname().c_str());
-  digitalWrite(STDLED, true);
 
-#ifndef OLED_IS_NONE   //Display connection information
-  sprintf(charbuff, "IP= ..%03d.%03d", ip[2], ip[3]); display.drawString(0, 24, charbuff);
-  display.drawString(0, 36, "Connected    ");  
+  //  Serial.printf("MAC address: %s , \nHostname: %s", WiFi.macAddress().c_str(), WiFi.hostname().c_str());   checkthat
+  digitalWrite(BLULED, true);
+
+#if defined(SCREEN_IS_64x48) | defined(SCREEN_IS_128x64) | defined(SCREEN_IS_WEMOS32)
+  sprintf(charbuff, "IP= ..%03d.%03d", ip[2], ip[3]);
+  display.drawString(0, 24, charbuff);
+  display.drawString(0, 36, "Connected");
   display.display();
   delay(2000);
 #endif
 
+#ifdef SCREEN_IS_HELTEC
+  sprintf(charbuff, "IP= %03d . %03d . %03d . %03d", ip[0], ip[1], ip[2], ip[3]);
+  display.drawString(0, 48, charbuff);
+  display.display();
+#endif
+
+#ifdef SCREEN_IS_TTGO
+  tft.print("Connected to: ");
+  tft.println(WIFI_SSID);
+  sprintf(charbuff, "IP= %03d . %03d . %03d . %03d", ip[0], ip[1], ip[2], ip[3]);
+  tft.println(charbuff);
+#endif
+
   getNTP();
-  delay(3000);
-  getEpoch();            // writes the Epoch (Numbers of seconds till 1.1.1970...
-  Serial.println("\nGot Epoch");
-  getTimeData();         // breaks down the Epoch into discrete values.
-  sprintf(charbuff, "Now is %02d:%02d:%02d, Date is %s, %02d %s %04d", Hour, Minute, Second, DayName, Day, MonthName, Year);
+  delay(6000);
+  getEpoch();  // writes the Epoch (Numbers of seconds till 1.1.1970...
+  Serial.print("Got Epoch, ");
+  getTimeData();  // breaks down the Epoch into discrete values.
+  sprintf(charbuff, "Now: %02d:%02d, %02d %s %04d", Hour, Minute, Day, MonthName, Year);
   Serial.println(charbuff);
+
+#ifdef SCREEN_IS_HELTEC
+  display.drawString(0, 60, charbuff);
+  display.display();
+#endif
+
+#ifdef SCREEN_IS_TTGO
+  tft.println(charbuff);
+#endif
 
   initOTA();
   ArduinoOTA.setHostname(DEVICE_NAME);
-  Serial.print("Start OTA on ");
-  Serial.println(DEVICE_NAME);
+  Serial.print("Start OTA, ");
   ArduinoOTA.begin();
   delay(500);
 
-
 #ifndef UDP_IS_NONE
   UDP.begin(ESP_UDP_PORT);
-  Serial.printf("\nOpening UDP port: %u", ESP_UDP_PORT);
+  Serial.printf("Start UDP: %u\n", ESP_UDP_PORT);
 #endif
 
-#if defined (TERM_IS_SERIAL)
-  Serial.println("Menu ready on Serial!");
+  Serial.print("Menu ready on ");
+#if defined(TERM_IS_SOFTSER)
+  Serial.println("SoftSerial");
 #endif
 
-#if defined (TERM_IS_SOFTSER)
-  SwSerial.begin(SERIAL_SPEED);
-  Serial.println("Menu ready on SoftSerial");
+#if defined(TERM_IS_SERIAL)
+  Serial.println("Serial");
 #endif
 
-#if defined (TERM_IS_TELNET)
+#if defined(TERM_IS_TELNET)
   TelnetStream.begin();
-  Serial.println("Menu ready on Telnet");
-  Serial.flush();
+  Serial.println("Telnet"),
+    Serial.flush();
   delay(500);
 #endif
 
-#if defined (D7_IS_VICTRON)
+#if defined(D7_IS_VICTRON) & defined(CONTR_IS_ESP8266)
   Serial.println("Serial Swap to Victron");
   Serial.swap();
 #endif
 
 #if defined INA_IS_226
-  Wire.begin(SDA, SCL);
   // INA 226 Panel Sensor
-  INA.begin( AMPERE0 , SHUNT0, 0);      // Define max Ampere, Shunt value, Address
-  INA.setBusConversion(100);            // Maximum conversion time 100ms
-  INA.setShuntConversion(100);          // Maximum conversion time 100ms
-  INA.setAveraging(32);                  // Average each reading n-times
-  INA.setMode(INA_MODE_CONTINUOUS_BOTH); // Bus/shunt measured continuously
+  INA.begin(AMPERE0, SHUNT0, 0);          // Define max Ampere, Shunt value, Address
+  INA.setBusConversion(100);              // Maximum conversion time 100ms
+  INA.setShuntConversion(100);            // Maximum conversion time 100ms
+  INA.setAveraging(32);                   // Average each reading n-times
+  INA.setMode(INA_MODE_CONTINUOUS_BOTH);  // Bus/shunt measured continuously
   //  INA.alertOnPowerOverLimit(true;450000); //Set alert when power over 45W.
+  Serial.println("\nINA Ready");
 #endif
 
-#if defined (DASHBRD_IS_THINGER)
+#if defined(DASHBRD_IS_THINGER)
   // *** Thinger configuration ***
   // definition of structures for transmission
   // digital pin control example (i.e. turning on/off a light, a relay, configuring a parameter, etc)
@@ -136,41 +188,39 @@ void setup()
   // it is a bit confusing, but Thinger code placed in setup will be executed when required by the payload.
 
   // Device
-  thing["menu"] << [](pson & in) {
-    displayPage    = in["displayPage"];
+  thing["menu"] << [](pson& in) {
+    displayPage = in["displayPage"];
     displaySubPage = in["displaySubPage"];
-    serialPage     = in["serialPage"];
-    wirelessPage   = in["wirelessPage"];
+    serialPage = in["serialPage"];
+    wirelessPage = in["wirelessPage"];
   };
 
-  thing["measure"] >> [](pson & out)
-  {
-    out["PanV"]            = payload.PanV ;
-    out["PanI"]            = payload.PanI ;
-    out["PanW"]            = payload.PanW ;
-    out["BatV"]            = payload.BatV ;
-    out["BatI"]            = payload.BatI ;
-    out["BatW"]            = payload.BatW ;
-    out["LodI"]            = payload.LodI ;
-    out["LodW"]            = payload.LodW ;
-    out["Iohm"]             = payload.IOhm ;
-    out["ChSt"] = payload.ChSt;
+  thing["measure"] >> [](pson& out) {
+    out["PanV"] = payload.PanV;
+    out["PanI"] = payload.PanI;
+    out["PanW"] = payload.PanW;
+    out["BatV"] = payload.BatV;
+    out["BatI"] = payload.BatI;
+    out["BatW"] = payload.BatW;
+    out["BatI"] = payload.BatI;
+    out["LodW"] = payload.LodW;
+    out["LodI"] = payload.LodI;
+    out["Iohm"] = payload.IOhm * 1000;
+    out["ChSt"] = payload.ChSt * 10;
   };
 
-  thing["weather"] >> [](pson & out)
-  {
+  thing["weather"] >> [](pson& out) {
     out["temperature"] = temperature;
-    out["humidity"]    = humidity;
-    out["pressure"]    = pressure;
-    out["wind"]        = wind_speed;
-    out["direction"]   = wind_direction;
-    out["cloudiness"]  = cloudiness;
-    out["summary"]     = weather_summary;
+    out["humidity"] = humidity;
+    out["pressure"] = pressure;
+    out["wind"] = wind_speed;
+    out["direction"] = wind_direction;
+    out["cloudiness"] = cloudiness;
+    out["summary"] = weather_summary;
   };
 
-  thing["DAY"] >> [](pson & out)
-  {
-    out["BAhDay"] = BatAh[27];
+  thing["DAY"] >> [](pson& out) {
+    out["BAhDay"] = BatAh[26];
     out["B00Ah"] = BatAh[0];
     out["B01Ah"] = BatAh[1];
     out["B02Ah"] = BatAh[2];
@@ -223,79 +273,76 @@ void setup()
     out["B23V"] = BatVavg[23];
   };
 
-  thing["HOUR"] >> [](pson & out)
-  {
-    out["BatV"]  = payload.BatV;
-    out["BatI"]  = payload.BatI;
-    out["BatW"]  = payload.BatW;
-    out["PanI"]  = payload.PanI ;
-    out["PanV"]  = payload.PanV ;
-    out["PanW"]  = payload.PanW;
-    out["Ohm"]   = payload.IOhm;
+  thing["HOUR"] >> [](pson& out) {
+    out["BatV"] = payload.BatV;
+    out["BatI"] = payload.BatI;
+    out["BatW"] = payload.BatW;
+    out["PanI"] = payload.PanI;
+    out["PanV"] = payload.PanV;
+    out["PanW"] = payload.PanW;
+    out["Ohm"] = payload.IOhm;
     out["BatAh"] = BatAh[25];
     out["percent_charged"] = payload.ChSt;
 
-    out["temperature"]  = temperature;
-    out["humidity"]     = humidity;
-    out["pressure"]     = pressure;
-    out["wind"]         = wind_speed;
-    out["direction"]    = wind_direction;
-    out["summary"]      = weather_summary;
+    out["temperature"] = temperature;
+    out["humidity"] = humidity;
+    out["pressure"] = pressure;
+    out["wind"] = wind_speed;
+    out["direction"] = wind_direction;
+    out["summary"] = weather_summary;
   };
 
-  thing["MIN"] >> [](pson & out)
-  {
-    out["BatI"]      = payload.BatI ;
-    out["BatV"]      = payload.BatV ;
-    out["BatW"]      = payload.BatW ;
-    out["PanI"]      = payload.PanI ;
-    out["PanV"]      = payload.PanV ;
-    out["PanW"]      = payload.PanW ;
-    out["LodI"]      = payload.LodI ;
-    out["LodW"]      = payload.LodW ;
-    out["BatAh"]      = BatAh[25];
+  thing["MIN"] >> [](pson& out) {
+    out["BatI"] = payload.BatI;
+    out["BatV"] = payload.BatV;
+    out["BatW"] = payload.BatW;
+    out["PanI"] = payload.PanI;
+    out["PanV"] = payload.PanV;
+    out["PanW"] = payload.PanW;
+    out["BatI"] = payload.BatI;
+    out["LodW"] = payload.LodW;
+    out["BatAh"] = BatAh[24];
   };
 
-  thing["EVENT"] >> [](pson & out)
-  {
-    out["BatI"]      = payload.BatI ;
-    out["BatV"]      = payload.BatV ;
-    out["PanV"]      = payload.PanV ;
-    out["LodI"]      = payload.LodI ;
-    out["BatAh"]     = BatAh[25];
+  thing["EVENT"] >> [](pson& out) {
+    out["BatI"] = payload.BatI;
+    out["BatV"] = payload.BatV;
+    out["PanV"] = payload.PanV;
+    out["BatI"] = payload.BatI;
+    out["BatAh"] = BatAh[25];
   };
 
   //Communication with Thinger.io
   thing.handle();
-  delay(1000); // Wait for contact to happen.
+  delay(1000);  // Wait for contact to happen.
   // Retrieve Persistance values
 
   pson persistance;
 #ifdef DASHBRD_IS_THINGER
   thing.get_property("persistance", persistance);
-  currentInt          = persistance["currentInt"];
-  nCurrent            = persistance["nCurrent"];
-  BatAh[25]           = persistance["Ah/hour"];
-  BatAh[27]           = persistance["Ah/yesterday"];
+  currentInt = persistance["currentInt"];
+  nCurrent = persistance["nCurrent"];
+  BatAh[25] = persistance["Ah/hour"];
+  BatAh[27] = persistance["Ah/yesterday"];
 #endif
   temperature = persistance["temperature"];
-  humidity    = persistance["humidity"];
-  pressure    = persistance["pressure"];
-  wind_speed          = persistance["wind"];
-  wind_direction      = persistance["direction"];
+  humidity = persistance["humidity"];
+  pressure = persistance["pressure"];
+  wind_speed = persistance["wind"];
+  wind_direction = persistance["direction"];
 
   pson statAh;
   thing.get_property("statAh", statAh);  // 0..23=hour, 25=payload.PanI, 26=statAh 24h, 27= BatAhDay, 28=BatAhNight, 29=BatAh22-24
-  BatAh[0]  = statAh["00h"];
-  BatAh[1]  = statAh["01h"];
-  BatAh[2]  = statAh["02h"];
-  BatAh[3]  = statAh["03h"];
-  BatAh[4]  = statAh["04h"];
-  BatAh[5]  = statAh["05h"];
-  BatAh[6]  = statAh["06h"];
-  BatAh[7]  = statAh["09h"];
-  BatAh[8]  = statAh["08h"];
-  BatAh[9]  = statAh["09h"];
+  BatAh[0] = statAh["00h"];
+  BatAh[1] = statAh["01h"];
+  BatAh[2] = statAh["02h"];
+  BatAh[3] = statAh["03h"];
+  BatAh[4] = statAh["04h"];
+  BatAh[5] = statAh["05h"];
+  BatAh[6] = statAh["06h"];
+  BatAh[7] = statAh["09h"];
+  BatAh[8] = statAh["08h"];
+  BatAh[9] = statAh["09h"];
   BatAh[10] = statAh["10h"];
   BatAh[11] = statAh["11h"];
   BatAh[12] = statAh["12h"];
@@ -316,16 +363,16 @@ void setup()
 
   pson statVh;
   thing.get_property("statVh", statVh);  // 0..23=hour, 25=payload.PanI, 26=statVh 24h, 27= BatAhDay, 28=BatAhNight, 29=BatAh22-24
-  BatVavg[0]  = statVh["00h"];
-  BatVavg[1]  = statVh["01h"];
-  BatVavg[2]  = statVh["02h"];
-  BatVavg[3]  = statVh["03h"];
-  BatVavg[4]  = statVh["04h"];
-  BatVavg[5]  = statVh["05h"];
-  BatVavg[6]  = statVh["06h"];
-  BatVavg[7]  = statVh["09h"];
-  BatVavg[8]  = statVh["08h"];
-  BatVavg[9]  = statVh["09h"];
+  BatVavg[0] = statVh["00h"];
+  BatVavg[1] = statVh["01h"];
+  BatVavg[2] = statVh["02h"];
+  BatVavg[3] = statVh["03h"];
+  BatVavg[4] = statVh["04h"];
+  BatVavg[5] = statVh["05h"];
+  BatVavg[6] = statVh["06h"];
+  BatVavg[7] = statVh["09h"];
+  BatVavg[8] = statVh["08h"];
+  BatVavg[9] = statVh["09h"];
   BatVavg[10] = statVh["10h"];
   BatVavg[11] = statVh["11h"];
   BatVavg[12] = statVh["12h"];
@@ -344,12 +391,26 @@ void setup()
   BatVavg[27] = statVh["Yesterday"];
   BatVavg[26] = statVh["Today"];
 
-#endif // defined (DASHBRD_IS_THINGER)
+#endif  // defined (DASHBRD_IS_THINGER)
+
+#ifdef COM_IS_HOURLY
+  // print the header for the UDP report
+  UDP.beginPacket(COM_UDP_ADDR, COM_UDP_PORT);
+  sprintf(charbuff, " \nHourly Report");
+  UDP.print(charbuff);
+  UDP.print("\n   Date Hour   | Bat Ah   | Bat Volt  | Weather");
+#endif
 
   // *** Defaults to start with ***
   wirelessPage = ' ';
   serialPage = ' ';
-  displayPage = ' ';
+  displayPage = '1';
   digitalWrite(GRNLED, false);
 
-} //End Setup
+  delay(10000);
+
+#ifdef SCREEN_IS_TTGO
+  tft.fillScreen(TFT_BLACK);
+#endif
+
+}  //End Setup

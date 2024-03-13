@@ -3,15 +3,15 @@ void serialRun()
   switch (serialPage)
   {
     case 'A':  // Print A0
-      static int i = 0;
-      char timeStr[20];
-      sprintf(timeStr, "%02d-%02d-%02d %02d:%02d:%02d", Year, Month, Day, Hour, Minute, Second);
-
-      Console1.print(i++);
-      Console1.print(" ");
-      Console1.print(timeStr);
+      //char timeStr[30];
+      offsettedNow = now - 86400;
+      offsettedTimeinfo = localtime(&offsettedNow);
+      strftime(charbuff, 30, "%x ", offsettedTimeinfo);
+      Console1.println();
+      Console1.print(charbuff);
       Console1.print(" A0: ");
       Console1.println(analogRead(A0));
+      serialPage = 0;
       break;
 
     case 'B':  //Battery Report
@@ -61,7 +61,7 @@ void serialRun()
       break;
 
     case 'V' : //Print Values
-      Console1.printf("BatV:%05.2f BatI:%05.2f BatW: %05.2f PanV: %05.2f PanI: %05.2f PanW: %05.2f LoadI: %05.2f LoadW: %05.2f IOhm: %5.4f\n", payload.BatV, payload.BatI, payload.BatW, payload.PanV, payload.PanI, payload.PanW, payload.LodI, payload.LodW, payload.IOhm);
+      Console1.printf("BatV:%05.2f BatI:%05.2f BatW: %05.2f PanV: %05.2f PanI: %05.2f PanW: %05.2f LoadI: %05.2f LoadW: %05.2f BatR: %5.4f POC:%02u\n", payload.BatV, payload.BatI, payload.BatW, payload.PanV, payload.PanI, payload.PanW, payload.LodI, payload.LodW, payload.IOhm, payload.ChSt);
       break;
 
     case 'W':   // Weather Plot

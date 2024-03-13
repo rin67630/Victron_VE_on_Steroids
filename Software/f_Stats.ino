@@ -1,5 +1,4 @@
-void statsRun()
-{
+void statsRun() {
 
   /* todo Compute these values ? ***
     BatDD;          //  Deepest Discharge (Ah since last Float?)
@@ -16,33 +15,37 @@ void statsRun()
 
   // *** Battery hourly integration ***
   currentInt += payload.BatI;
-  nCurrent ++;
+  nCurrent++;
 
-  // *** Battery hourly array handling ***
+  // *** Battery Percentage of Charge ***
+#ifdef POC_IS_TABLE
+  payload.ChSt = 6 ;  // will be replaced later by a table conversion, currently only to display value
+#endif
+  BatAh[24] = currentInt / nCurrent;    // Ah current hour
+  BatVavg[24] = payload.BatV;
 
-  if (HourExpiring)
-  {
-    BatAh[Hour] = currentInt / nCurrent;
+    // *** Battery hourly array handling ***
+    if (HourExpiring) {
+    BatAh[Hour] = BatAh[24];   
     nCurrent = 0;
     currentInt = 0;
-    BatAh[25] = BatAh[Hour];   //last hour
-    BatAh[26] = 0;             // today (0h->current hour)
-    for  (byte n = 0; n <= Hour; n++)
+    BatAh[25] = BatAh[Hour];  //last hour
+    BatAh[26] = 0;            // today (0h->current hour)
+    for (byte n = 0; n <= Hour; n++) 
     {
       BatAh[26] = BatAh[26] + BatAh[n];
     }
     BatVavg[Hour] = payload.BatV;
-    BatVavg[25] = payload.BatV;
-    BatVavg[26] = 0;              // today (0h->current hour)
-    for  (byte n = 0; n <= Hour; n++)
+    BatVavg[25]   = payload.BatV;
+    BatVavg[26] = 0;  // today (0h->current hour)
+    for (byte n = 0; n <= Hour; n++) 
     {
       BatVavg[26] = BatVavg[26] + BatVavg[n];
     }
-    BatVavg[26] = BatVavg[26] / (Hour + 1) ;
-  } // end hour expiring
+    BatVavg[26] = BatVavg[26] / (Hour + 1);
+  }  // end hour expiring
 
-  if (DayExpiring)
-  {
+  if (DayExpiring) {
     BatAh[27] = BatAh[26];
     BatAh[28] = BatAh[27];
     BatAh[29] = BatAh[28];
@@ -53,33 +56,33 @@ void statsRun()
     BatVavg[30] = BatVavg[29];
   }
 
-#if defined (DASHBRD_IS_THINGER)
+#if defined(DASHBRD_IS_THINGER)
   // ***  Persistancy ***  (requested to survive reset)
 
-  if (Minute % 10 == 2 && Second == 10)                      // call every 10 minutes
+  if (Minute % 10 == 2 && Second == 10)  // call every 10 minutes
   {
     //Persistance
 
     pson persistance;
-    persistance["currentInt"]    = currentInt ;
-    persistance["nCurrent"]      = nCurrent;
-    persistance["Ah/hour"]       = BatAh[25];
-    persistance["Ah/yesterday"]  = BatAh[27];
+    persistance["currentInt"] = currentInt;
+    persistance["nCurrent"] = nCurrent;
+    persistance["Ah/hour"] = BatAh[25];
+    persistance["Ah/yesterday"] = BatAh[27];
 
-    persistance["temperature"]   = temperature;
-    persistance["humidity"]      = humidity;
-    persistance["pressure"]      = pressure;
-    persistance["wind"]          = wind_speed;
-    persistance["direction"]     = wind_direction;
-    persistance["cloudiness"]    = cloudiness;
-    persistance["summary"]       = weather_summary;
-    persistance["last_update"]   = SecondOfDay;
+    persistance["temperature"] = temperature;
+    persistance["humidity"] = humidity;
+    persistance["pressure"] = pressure;
+    persistance["wind"] = wind_speed;
+    persistance["direction"] = wind_direction;
+    persistance["cloudiness"] = cloudiness;
+    persistance["summary"] = weather_summary;
+    persistance["last_update"] = SecondOfDay;
     thing.set_property("persistance", persistance, true);
   }
 
-  if (Minute % 10 == 2 && Second == 11)                      // call every 10 minutes (one second later)
+  if (Minute % 10 == 2 && Second == 11)  // call every 10 minutes (one second later)
   {
-    pson statAh;           // 0..23=hour, 25=current.
+    pson statAh;  // 0..23=hour, 25=current.
     statAh["00h"] = BatAh[0];
     statAh["01h"] = BatAh[1];
     statAh["02h"] = BatAh[2];
@@ -110,9 +113,9 @@ void statsRun()
     thing.set_property("statAh", statAh);
   }
 
-  if (Minute % 10 == 2 && Second == 11)                      // call every 10 minutes (one second later)
+  if (Minute % 10 == 2 && Second == 11)  // call every 10 minutes (one second later)
   {
-    pson statVh;           // 0..23=hour, 25=current.
+    pson statVh;  // 0..23=hour, 25=current.
     statVh["00h"] = BatVavg[0];
     statVh["01h"] = BatVavg[1];
     statVh["02h"] = BatVavg[2];
@@ -145,27 +148,24 @@ void statsRun()
 #endif
 
 #ifdef WEATHER_IS_OWM
-  if (WiFi.status() == WL_CONNECTED)
-  {
-    if (Minute % 10 == 3 && Second == 32)                    // call every 10 minutes
+  if (WiFi.status() == WL_CONNECTED) {
+    if (Minute % 10 == 3 && Second == 32)  // call every 10 minutes
     {
       HTTPClient http;
       http.begin(WifiClient, OPEN_WEATHER_MAP_URL);
       int httpCode2 = http.GET();
-      if (httpCode2 == HTTP_CODE_OK)
-      {
+      if (httpCode2 == HTTP_CODE_OK) {
         JSONpayload = http.getString();
         DynamicJsonDocument doc(1024);
         auto error = deserializeJson(doc, JSONpayload.c_str());
-        if ( not error)
-        {
-          temperature  = doc["main"]["temp"];
-          pressure     = doc["main"]["pressure"];
-          humidity     = doc["main"]["humidity"];
-          wind_speed           = doc["wind"]["speed"];
-          wind_direction       = doc["wind"]["deg"];
-          cloudiness           = doc["clouds"]["all"];  // % Clouds
-          const char* w        = doc["weather"][0]["description"];
+        if (not error) {
+          temperature = doc["main"]["temp"];
+          pressure = doc["main"]["pressure"];
+          humidity = doc["main"]["humidity"];
+          wind_speed = doc["wind"]["speed"];
+          wind_direction = doc["wind"]["deg"];
+          cloudiness = doc["clouds"]["all"];  // % Clouds
+          const char* w = doc["weather"][0]["description"];
           weather_summary = w;
         }
         //Console1.println("\nGot weather from OWM");
@@ -174,11 +174,11 @@ void statsRun()
       }
       http.end();
     }  // End minute %10...
-  }  // end Wifi connected
+  }    // end Wifi connected
 #endif
 
 #if defined(WEATHER_IS_BME680)
-  bme.performReading(); 
+  bme.performReading();
   temperature = bme.temperature;
   pressure = bme.pressure / 100;
   humidity = bme.humidity;

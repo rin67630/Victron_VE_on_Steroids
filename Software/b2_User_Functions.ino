@@ -11,9 +11,13 @@ void RecvWithEndMarker() {
   static byte ndx = 0;
   char endMarker = '\n';
   char rc;
-
+#ifdef CONTR_IS_ESP8266
   while (Serial.available() > 0 && new_data == false) {
     rc = Serial.read();
+#else
+  while (Serial2.available() > 0 && new_data == false) {
+    rc = Serial2.read();
+#endif
     if (rc != endMarker) {
       receivedChars[ndx] = rc;
       ndx++;
@@ -131,7 +135,9 @@ void GatherValues()                   // Translate the Victron protocol Keywords
     if (String(keywords[i]) == "PPV")   payload.PanW = atof(value[i]) / 1000;
 #endif
     if (String(keywords[i]) == "IL")    payload.LodI = atof(value[i]) / 1000;
+    #ifdef POC_IS_VICTRON
     if (String(keywords[i]) == "CS")    payload.ChSt = atoi(value[i]);
+    #endif
     if (String(keywords[i]) == "ERR")   payload.Err = atoi(value[i]);
   }
 } //End Gather Values
