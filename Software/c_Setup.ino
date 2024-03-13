@@ -179,6 +179,16 @@ void setup() {
   Serial.println("\nINA Ready");
 #endif
 
+#ifdef WEATHER_IS_BME680  // Local Temperature / Pressure / Humidity sensor
+  if (not bme.begin()) {
+    Serial.println("Could not find a valid BME680 sensor, check wiring!");
+    while (1);
+  }
+bme.setTemperatureOversampling(BME680_OS_8X);
+bme.setHumidityOversampling(BME680_OS_2X);
+bme.setPressureOversampling(BME680_OS_4X);
+#endif
+
 #if defined(DASHBRD_IS_THINGER)
   // *** Thinger configuration ***
   // definition of structures for transmission

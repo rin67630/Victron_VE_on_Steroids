@@ -35,7 +35,7 @@ SSD1306 display(0x3c, SDA, SCL, GEOMETRY_64_48);  // WEMOS OLED 64*48 shield
 #endif
 
 #ifdef SCREEN_IS_128x64
-#include <SSD1306.h>              // from https://github.com/ThingPulse/esp8266-oled-ssd1306/
+#include <SSD1306.h>                               // from https://github.com/ThingPulse/esp8266-oled-ssd1306/
 SSD1306 display(0x3c, SDA, SCL, GEOMETRY_128_64);  //OLED 128*64 soldered
 #endif
 
@@ -51,7 +51,7 @@ SSD1306 display(0x3c);
 #define SDA 4
 #define SCL 15
 #define RST 16
-#include <SSD1306.h>  
+#include <SSD1306.h>
 SSD1306 display(0x3c);  //cut: , SDA, SCL, GEOMETRY_128_64, RST)
 #endif
 
@@ -91,6 +91,12 @@ WiFiUDP UDP;
 #include <ArduinoJson.h>  // Libs for Webscraping
 #define OPEN_WEATHER_MAP_URL "http://api.openweathermap.org/data/2.5/weather?id=" OPEN_WEATHER_MAP_LOCATION_ID "&appid=" OPEN_WEATHER_MAP_APP_ID "&units=" OPEN_WEATHER_MAP_UNITS "&lang=" OPEN_WEATHER_MAP_LANGUAGE
 WiFiClient WifiClient;
+#endif
+
+#ifdef WEATHER_IS_BME680  // Local Temperature / Pressure / Humidity sensor
+#include "Adafruit_Sensor.h"
+#include "Adafruit_BME680.h"
+Adafruit_BME680 bme;  ///< Create an instance of the BME280 class
 #endif
 
 #if defined(DASHBRD_IS_THINGER)
