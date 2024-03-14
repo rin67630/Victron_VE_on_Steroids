@@ -44,7 +44,8 @@ I can re-use a lot of code from this project on Victron-on Steroids.
 The current default Thinger Screen with a one minute pace looks like that:   
 ![grafik](https://github.com/rin67630/Victron_VE_on_Steroids/assets/14197155/306c172f-6d3d-4fdd-a3c0-9738d9368115)  
 You can get a one second-pace as well (however only building up when page is active to limit server load)
-![grafik](https://github.com/rin67630/Victron_VE_on_Steroids/assets/14197155/4e716d8d-0111-44da-ad36-024d30878827)
+![image](https://github.com/rin67630/Victron_VE_on_Steroids/assets/14197155/3b21a957-1d55-4a91-ba97-a3c7f1078e52)
+
 
 But everyone is free to design his own dashboard online !
 
