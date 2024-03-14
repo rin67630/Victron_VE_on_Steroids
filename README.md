@@ -47,7 +47,15 @@ You can get a one second-pace as well (however only building up when page is act
 ![image](https://github.com/rin67630/Victron_VE_on_Steroids/assets/14197155/3b21a957-1d55-4a91-ba97-a3c7f1078e52)
 Finally you can see the MPPT algorithm working!
 
-But everyone is free to design his own dashboard online !
+But everyone is free to design his own dashboard online !  
+You can get all that from a cheap ESP8266 like a Wemos D1 clone for less than 4$. 
+
+## Remote screen
+Additionally, a remote display running on an ESP32 TTGO T1 (~20$) is an optional part of the ecosystem:  
+![image](https://github.com/rin67630/Victron_VE_on_Steroids/assets/14197155/f60c3fa4-3f4f-4f22-b111-eb11b96d373e)  
+You can switch between the 6 screens using the 2 hardware buttons of the TTGO module, or over the Telnet Menu using your computer. 
+The communication occurs over WiFi, not using the range limited  Bluetooth.
+
 
 ## Work progress
  
