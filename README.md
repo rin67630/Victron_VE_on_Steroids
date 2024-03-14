@@ -45,6 +45,8 @@ The current default Thinger Screen with a one minute pace looks like that:
 ![image](https://github.com/rin67630/Victron_VE_on_Steroids/assets/14197155/e5c46273-bd37-4a97-8a0e-a20b6aebe872)
 You can get a one second-pace as well (however only building up when page is active to limit server load)
 ![image](https://github.com/rin67630/Victron_VE_on_Steroids/assets/14197155/3b21a957-1d55-4a91-ba97-a3c7f1078e52)
+Finally you can see the MPPT algorithm working!
+
 But everyone is free to design his own dashboard online !
 
 ## Work progress
