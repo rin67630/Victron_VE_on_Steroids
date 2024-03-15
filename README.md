@@ -13,12 +13,14 @@ https://github.com/rin67630/Victron_VE_on_Steroids/tree/main/Hardware/Victron-on
 
 ## Victron_VE_on_Steroids design
 
-Victron_VE_on_Steroids is designed to deliver the full power of SCC / battery logging on a single ESP8366 device.
-You just don't need any additional hardware. You see gorgeous dashborads wordwide on the Internet, can downloads historic data to Excel etc.
+Victron_VE_on_Steroids is designed to deliver the full power of SCC / battery logging on a single ESP8366 device ($4).
+You just don't need any additional hardware, nor computer, nor gateway, nor subscription. 
+You see gorgeous dashboards wordwide on the Internet, can downloads historic data to Excel etc.
 
 But Victron_VE_on_Steroids is designed for more. It is an ecosystem. You use one ESP8266 for one SCC and a battery.  
 The devices can communicate in the LAN over the UDP protocol and exchange their measurements.  
-You can e.g. use a second remote ESP8266 with a display to display your values in the living room. Wirelessly, of course.
+You can e.g. use a second remote ESP moduel with a display to display your values in the living room. Wirelessly, of course.
+
 And finally I project to programm an ESP32 to aggregate several ESP8266 mesurements to one single thinger.io dashboard.
 
 
@@ -34,13 +36,11 @@ Then having the primary measurements, I decides to go further and provide additi
 
 For these last functions one need a data persistance that survives resets and also the ability to enter some variables.
 EEPROM is... Bah. Not really useful if you need to swap ESP devices.  
-For that sake i am using the services of Thinger.io  
+For that sake i am using the free basic services of Thinger.io  
 https://github.com/rin67630/Victron_VE_on_Steroids/blob/main/Documentation/Thinger.io.md
 
 I have used Thinger for a couple of other projects like Drok-Juntek-on Steroids, which is a Home Brew MPPT controler built on commercial buck converters.  
-https://github.com/rin67630/Drok-Juntek-on-steroids   
-(you can have a look there to see the dashboards and onboard screens)  
-I can re-use a lot of code from this project on Victron-on Steroids.  
+https://github.com/rin67630/Drok-Juntek-on-steroids. I could re-use a lot of code from this project on Victron-on Steroids.  
 The current default Thinger Screen with a one minute pace looks like that:   
 ![image](https://github.com/rin67630/Victron_VE_on_Steroids/assets/14197155/e5c46273-bd37-4a97-8a0e-a20b6aebe872)
 You can get a one second-pace as well (however only building up when page is active to limit server load)
