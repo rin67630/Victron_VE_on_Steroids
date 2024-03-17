@@ -26,7 +26,7 @@ void data1SRun() {
   A0Raw = A0Raw / 3;
 #endif
 
-#ifdef A0_IS_LUX    //Simulating a solar panel from LDR of a Witty.
+#ifdef A0_IS_SIMUL    //Simulating a solar panel from LDR of a Witty.
   payload.BatI = float(map(A0Raw,15, 1023, 0, 100 * A0_MAX)) / 300;  // Amperes Simulated Panel
   payload.BatV = 12.9 + payload.BatI / 12;                           // Adding current load effect
   if (A0Raw > 100) 
