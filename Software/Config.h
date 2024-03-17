@@ -8,7 +8,7 @@
 #define SCREEN_IS_REVERSED// _IS_NORMAL, _IS_REVERSED To turn the display 180° if required
 #define BRIGHTNESS  255   // PWM value for default brightness with TTGO 0=totally dark;255=totally shiny
 
-#define A0_IS_LUX        // _NONE , _DOUBLEBATTERY , _HALFBATTERY, _PANEL, _POT, _LUX
+#define A0_IS_SIMUL        // _NONE , _DOUBLEBATTERY , _HALFBATTERY, _PANEL, _POT, _SIMUL
 #define A0_MAX       15   // if A0 is used, define the voltage of the full range measure
 #define D0_IS_NONE        // _NONE , _RELAY1
 #define D5_IS_NONE        // _NONE , _RELAY2
