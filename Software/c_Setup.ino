@@ -53,7 +53,7 @@ void setup() {
   pinMode(BUTTON_UP, INPUT_PULLUP);
   pinMode(BUTTON_DOWN, INPUT_PULLUP);
 #endif
-#ifndef SCREEN_IS_NONE
+#if not defined (SCREEN_IS_NONE) && not defined (SCREEN_IS_TTGO)
   //Initialize OLED Screens
   display.init();
   //  display.clear();
@@ -217,7 +217,9 @@ bme.setPressureOversampling(BME680_OS_4X);
     out["LodW"] = payload.LodW;
     out["LodI"] = payload.LodI;
     out["Iohm"] = payload.IOhm * 1000;
-    out["ChSt"] = payload.ChSt * 10;
+    out["CStr"] = StateKeywords[payload.ChSt];
+    out["PoC"]  = BatPoC;
+    out["CelV"] = CellV;
   };
 
   thing["weather"] >> [](pson& out) {

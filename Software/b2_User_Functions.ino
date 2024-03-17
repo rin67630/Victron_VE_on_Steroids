@@ -135,9 +135,9 @@ void GatherValues()                   // Translate the Victron protocol Keywords
     if (String(keywords[i]) == "PPV")   payload.PanW = atof(value[i]) / 1000;
 #endif
     if (String(keywords[i]) == "IL")    payload.LodI = atof(value[i]) / 1000;
-    #ifdef POC_IS_VICTRON
-    if (String(keywords[i]) == "CS")    payload.ChSt = atoi(value[i]);
-    #endif
+
+    if (String(keywords[i]) == "CS")    payload.ChSt = atoi(value[i] * 10);
+
     if (String(keywords[i]) == "ERR")   payload.Err = atoi(value[i]);
   }
 } //End Gather Values
@@ -148,8 +148,8 @@ void EstimateIOhm()
   // ***Estimate battery's internal resistance***
   if ((dBatI < -0.1) || (dBatI > 0.1))  // only if variation strong enough.
   {
-   float m = dBatV / dBatI;          // ( r = dv / di)
-    if (m < 0) m = -m ;
+   float m = dBatV / dBatI;                          // ( R = dV / dI)
+    if (m < 0) m = -m ;                              // Absolute value of dV/dI
     payload.IOhm = + (m - payload.IOhm) / 100 ;      // Low pass filter to average IOhm
   }
 }

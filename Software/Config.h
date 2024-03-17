@@ -8,7 +8,7 @@
 #define SCREEN_IS_REVERSED// _IS_NORMAL, _IS_REVERSED To turn the display 180° if required
 #define BRIGHTNESS  255   // PWM value for default brightness with TTGO 0=totally dark;255=totally shiny
 
-#define A0_IS_SIMUL        // _NONE , _DOUBLEBATTERY , _HALFBATTERY, _PANEL, _POT, _SIMUL
+#define A0_IS_SIMUL       // _NONE , _DOUBLEBATTERY , _HALFBATTERY, _PANEL, _POT, _SIMUL
 #define A0_MAX       15   // if A0 is used, define the voltage of the full range measure
 #define D0_IS_NONE        // _NONE , _RELAY1
 #define D5_IS_NONE        // _NONE , _RELAY2
@@ -20,20 +20,20 @@
 #define INA_VBUS_IS_FULL  // _FULL _HALF   (when high voltage schematic is used)
 #define NUMBER_CELLS      4     // Number of cell in Battery
 #define AH_CELLS          100   // AH of the battery
-#define TYPE_IS_LIFEPO    // _LIFPO, _LEAD, _LIION
+#define TYPE_IS_LIFEPO    // _LIFEPO, _LEAD, _LIION
 #define POC_IS_TABLE      // _TABLE, _VICTRON   defines if POC is estmated from a table or comes from Victron
 
 //----------------------- SOFTWARE OPTIONS ---------------------------------
 #define WEATHER_IS_OWM     // _NONE , _OWM , _BME680       // (Source of the Weather Information)
-#define DASHBRD_IS_NONE // _NONE , _THINGER          // (Internet Dashboard)
-#define TERM_IS_TELNET     // _NONE , _TELNET, _SERIAL , _SOFTSER, _2SERIAL // defines where do Menus and Reports occur: _SERIAL and D7_IS_VICTRON are mutually exclusive )
-#define UDP_IS_SEND     // _NONE , _SEND , _RECEIVE  // (UDP Inter-ESP Communication)
+#define DASHBRD_IS_NONE    // _NONE , _THINGER          // (Internet Dashboard)
+#define TERM_IS_TELNET     // _TELNET, _SERIAL , _SOFTSER, _2SERIAL // defines where do Menus and Reports occur: _SERIAL and D7_IS_VICTRON are mutually exclusive )
+#define UDP_IS_SEND        // _NONE , _SEND , _RECEIVE  // (UDP Inter-ESP Communication)
 #define COM_IS_NONE        // _NONE , _HOURLY           // Periodical reports to computer 
 #define ESP_UDP_ADDR       "192.168.188.85"                 // (IP of the receiving ESP having UDP_IS_RECEIVE) 
 #define ESP_UDP_PORT       4200  // (Port used to send/receive Values to other ESP)
 #define COM_UDP_ADDR       "192.168.188.96"                  // (IP of the receiving computer for night reports) 
 #define COM_UDP_PORT       4230                            // (Port used to send/receive Values to other computer) 
-#define DEVICE_NAME        "Luxmeter"                      // Name of the device used as Hostname and at Thinger.io
+#define DEVICE_NAME        "Witty"                      // Name of the device used as Hostname and at Thinger.io
 #define DEVICE_NUMBER      0                               // 0 if no ESP32 supervisor, else 1..4
 
 //--------------------------- WiFi Options -------------------------------------

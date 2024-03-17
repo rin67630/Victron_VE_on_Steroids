@@ -11,6 +11,7 @@
 #include <ArduinoOTA.h>
 #include "time.h"  // built-in
 #include <EEPROM.h>
+#include "InterpolationLib.h"
 
 // *** Optional libraries ***
 /* deprecated
@@ -186,9 +187,6 @@ byte wirelessPage;
 
 static IPAddress ip;
 
-//*** Buffers ***
-static char charbuff[120];  //Char buffer for many functions
-
 #if defined(D7_IS_VICTRON)
 //***Variables for Victron***
 char receivedChars[buffsize];                        // an array to store the received data
@@ -200,32 +198,33 @@ static byte blockindex = 0;
 bool new_data = false;
 bool blockend = false;
 #endif
+String StateKeywords[] = {"Off ","Low", "Fau", "Bul" , "Abs", "Flo", "Str", "Equ", "   ", "   "};
 
-//***Parameters Battery
+
+//***Parameters Battery POC
+double perc[10] = {  0,  20,  30,  40,  50,  60,  70,  80,  90, 100  };
 #ifdef TYPE_IS_LIION
-int CHA[10] = { 324, 336, 348, 3602, 372, 384, 396, 408, 420, 430 };
-int DIS[10] = { 300, 324, 336, 348, 3602, 372, 384, 396, 408, 420 };
+double cha[10]  = { 324, 336, 348, 360, 372, 384, 396, 408, 420, 430 };
+double dis[10]  = { 300, 324, 336, 348, 360, 372, 384, 396, 408, 420 };
 #endif
 
 #ifdef TYPE_IS_LIFEPO
-int CHA[10] = { 300, 315, 322, 325, 327, 330, 332, 335, 340, 365 };
-int DIS[10] = { 280, 300, 315, 322, 325, 327, 330, 332, 335, 340 };
+double cha[10] = { 300, 315, 322, 325, 327, 330, 332, 335, 340, 365 };
+double dis[10] = { 280, 300, 315, 322, 325, 327, 330, 332, 335, 340 };
 #endif
 
 #ifdef TYPE_IS_LEAD
-int CHA[10] = { 198, 201, 203, 205, 207, 208, 212, 218, 225, 238 };
-int DIS[10] = { 175, 189, 196, 198, 201, 203, 205, 207, 208, 212 };
+double cha[10] = { 198, 201, 203, 205, 207, 208, 212, 218, 225, 238 };
+double dis[10] = { 175, 189, 196, 198, 201, 203, 205, 207, 208, 212 };
 #endif
 
 
-
 struct payload {
-  byte DevNr = DEVICE_NUMBER;  // Device number 1..4 when using an ESP32 supervisor.
   //***Operating Values from Victron/SmartShunt***
   float BatV;   // V   Battery voltage, V
   float BatV1;  // V   Battery voltage, V  (Double or half Voltage)
   float BatI;   // I   Battery current, A
-  float BatW;   //  BatV*BatI
+  float BatW;   // W BatV*BatI
 
   float PanV;  // VPV Panel voltage,   V
   float PanI;  // PanW/PanV
@@ -235,14 +234,14 @@ struct payload {
   float LodW;  //  BatI*BatV
   float IOhm;  //  dV / dI
 
-  int ChSt;       // CS  Charge state, 0 to 9
+  int ChSt;       // CS  Charge state (not POC), 0 to 9
   int Err;        // ERR Error code, 0 to 119
   boolean LodOn;  // LOAD ON Load output state, ON/OFF
 } payload;
 
 //*** Buffers ***
 static char charbuff[120];  //Char buffer for many functions
-unsigned char UDPCharPayload[sizeof(payload)];  //  Array of characters as image of the structure for UDP xmit/rcv
+unsigned char UDPCharPayload[sizeof(payload)+2];  //  Array of characters as image of the structure for UDP xmit/rcv
 String JSONpayload;
 
 //***Operating Values Integrated from Victron***
@@ -280,6 +279,8 @@ time_t LastVMin;   //  Time of minimum Voltage
 // ***Full Cycle Test results
 float BatAHD;  // Battery total discharge capacity
 float BatAHC;  // Battery total charge capacity
+float BatPoC;  // Percentage of charge
+float CellV;   // Cell voltage
 
 // ***Power Integrations and mean values***
 float dBatI;  // delta_voltage

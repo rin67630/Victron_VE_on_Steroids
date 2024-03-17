@@ -16,30 +16,25 @@ void statsRun() {
   // *** Battery hourly integration ***
   currentInt += payload.BatI;
   nCurrent++;
-
-  // *** Battery Percentage of Charge ***
-#ifdef POC_IS_TABLE
-  payload.ChSt = 6 ;  // will be replaced later by a table conversion, currently only to display value
-#endif
+  CellV = payload.BatV / NUMBER_CELLS;
+  //state = StateKeywords[payload.ChSt];  //   Keyword for loading State
   BatAh[24] = currentInt / nCurrent;    // Ah current hour
   BatVavg[24] = payload.BatV;
 
-    // *** Battery hourly array handling ***
-    if (HourExpiring) {
-    BatAh[Hour] = BatAh[24];   
+  // *** Battery hourly array handling ***
+  if (HourExpiring) {
+    BatAh[Hour] = BatAh[24];
     nCurrent = 0;
     currentInt = 0;
     BatAh[25] = BatAh[Hour];  //last hour
     BatAh[26] = 0;            // today (0h->current hour)
-    for (byte n = 0; n <= Hour; n++) 
-    {
+    for (byte n = 0; n <= Hour; n++) {
       BatAh[26] = BatAh[26] + BatAh[n];
     }
     BatVavg[Hour] = payload.BatV;
-    BatVavg[25]   = payload.BatV;
+    BatVavg[25] = payload.BatV;
     BatVavg[26] = 0;  // today (0h->current hour)
-    for (byte n = 0; n <= Hour; n++) 
-    {
+    for (byte n = 0; n <= Hour; n++) {
       BatVavg[26] = BatVavg[26] + BatVavg[n];
     }
     BatVavg[26] = BatVavg[26] / (Hour + 1);
