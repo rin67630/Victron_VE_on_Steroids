@@ -3,7 +3,7 @@
                          _lasttime += (t))
 void getWiFi() 
 {
-  int retry = 0;
+//  int retry = 0;
   WiFi.mode(WIFI_STA);  // configure WiFi in Station Mode
   Serial.printf("Connecting to %s from Flash ", WIFI_SSID);
 

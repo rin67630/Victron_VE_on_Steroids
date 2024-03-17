@@ -52,7 +52,8 @@ void setup() {
 #endif
   pinMode(BUTTON_UP, INPUT_PULLUP);
   pinMode(BUTTON_DOWN, INPUT_PULLUP);
-#else
+#endif
+#ifndef SCREEN_IS_NONE
   //Initialize OLED Screens
   display.init();
   //  display.clear();

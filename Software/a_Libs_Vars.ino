@@ -266,9 +266,9 @@ float BatMV;  //  Number of Deep Discharges
 float BatOV;  //  Number of Overvoltages
 
 //*** Hourly integrated Values
-float BatAh[31];  //  Ah of the current hour
-//float BatWh[31];  //  Wh of the current hour
-float BatVavg[31];  //  Avg voltage in hour
+float BatAh[32];  //  Ah of the current hour
+//float BatWh[32];  //  Wh of the current hour
+float BatVavg[32];  //  Avg voltage in hour
 float currentInt;   //  Averaging bucket for hourly stats
 long nCurrent;      //  Counter for averaging
 

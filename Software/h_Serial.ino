@@ -50,7 +50,7 @@ void serialRun()
       break;
 
     case 'D' : //Debug report
-      Console1.printf("BatV:%05.2fV BatI:%05.3fA DelV: %6.4fV DelI: %6.4fA IOhm %5.4fR\n", payload.BatV, payload.BatI, dBatV, dBatI, payload.IOhm);
+      Console1.printf("A0: %i, BatV:%05.2fV BatI:%05.3fA DelV: %6.4fV DelI: %6.4fA IOhm %5.4fR\n",analogRead(A0), payload.BatV, payload.BatI, dBatV, dBatI, payload.IOhm);
       break;
 
     case 'J':   // Job Duration Report for debuggging
