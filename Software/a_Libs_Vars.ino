@@ -240,7 +240,9 @@ struct payload {
   boolean LodOn;  // LOAD ON Load output state, ON/OFF
 } payload;
 
-char UDPCharPayload[sizeof(payload)];  //  Array of characters as image of the structure for UDP xmit/rcv
+//*** Buffers ***
+static char charbuff[120];  //Char buffer for many functions
+unsigned char UDPCharPayload[sizeof(payload)];  //  Array of characters as image of the structure for UDP xmit/rcv
 String JSONpayload;
 
 //***Operating Values Integrated from Victron***
