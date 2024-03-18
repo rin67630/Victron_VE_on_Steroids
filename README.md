@@ -1,5 +1,7 @@
 # Victron_VE_on_Steroids
 Use an ESP to log values from Victron devices and much, much more.  
+![image](https://github.com/rin67630/Victron_VE_on_Steroids/assets/14197155/9bfe999f-cbed-4cef-90e9-863cbc600852)
+
 
 The project now has several options:  
 a) Plain Victron logger from the VE-direct port.  
