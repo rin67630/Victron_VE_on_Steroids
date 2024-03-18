@@ -145,7 +145,7 @@ void displayRun() {
       tft.println(charbuff);
       tft.setTextColor(TFT_ORANGE, TFT_BLACK);
       tft.setCursor(0, 85, 4);
-      sprintf(charbuff, "%02i %%PoC ", int(payload.ChSt * 10));
+      sprintf(charbuff, "%02i %%PoC ", int(BatPoC));
       tft.println(charbuff);
       tft.setTextColor(TFT_OLIVE, TFT_BLACK);
       tft.setCursor(110, 85, 4);
