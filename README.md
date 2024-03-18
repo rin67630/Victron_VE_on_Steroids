@@ -42,9 +42,9 @@ https://github.com/rin67630/Victron_VE_on_Steroids/blob/main/Documentation/Thing
 I have used Thinger for a couple of other projects like Drok-Juntek-on Steroids, which is a Home Brew MPPT controler built on commercial buck converters.  
 https://github.com/rin67630/Drok-Juntek-on-steroids. I could re-use a lot of code from this project on Victron-on Steroids.  
 The current default Thinger Screen with a one minute pace looks like that:   
-![image](https://github.com/rin67630/Victron_VE_on_Steroids/assets/14197155/badf62b4-8869-42ca-b62f-c9743daec138)  
+![image](https://github.com/rin67630/Victron_VE_on_Steroids/assets/14197155/c0101e71-e32b-41d9-9b46-56e4ddd9a320)  
 You can get a one second-pace as well (however only building up when page is active to limit server load)
-![image](https://github.com/rin67630/Victron_VE_on_Steroids/assets/14197155/3b21a957-1d55-4a91-ba97-a3c7f1078e52)  
+![image](https://github.com/rin67630/Victron_VE_on_Steroids/assets/14197155/3b21a957-1d55-4a91-ba97-a3c7f1078e52)   
 Finally you can see the MPPT algorithm working!
 
 But everyone is free to design his own dashboard online !  
