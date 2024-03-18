@@ -2,10 +2,11 @@
 Use an ESP to log values from Victron devices and much, much more.  
 
 The project now has several options:  
-a) plain Victron logger from the VE-direct port.  
+a) Plain Victron logger from the VE-direct port.  
 b) Vendor-agnostic smart shunt based on the INA226 chip and an extra shunt.  
 c) Extra-voltage measurement that can be used to measure half-battery voltage or double battery voltage*  
 d) BME386 Temp/Pressure/Humidity monitoring
+e) Simulation of a solar panel/SCC/Battery using just a 3$ Witty ESP8266 module without any additionla hadware (great for testing before making the plunge).
 
 Please have a look on the schematic diagram:
 https://github.com/rin67630/Victron_VE_on_Steroids/tree/main/Hardware/Victron-on-Steroids-Smarter-Shunt_Schematic.png
