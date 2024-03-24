@@ -10,8 +10,8 @@ c) Extra-voltage measurement that can be used to measure half-battery voltage or
 d) BME386 Temp/Pressure/Humidity monitoring
 e) Simulation of a solar panel/SCC/Battery using just a 3$ Witty ESP8266 module without any additionla hadware (great for testing before making the plunge).
 
-Please have a look on the schematic diagram:
-https://github.com/rin67630/Victron_VE_on_Steroids/tree/main/Hardware/Victron-on-Steroids-Smarter-Shunt_Schematic.png
+Please have a look on the extensive User Manual:
+https://github.com/rin67630/Victron_VE_on_Steroids/blob/main/Documentation/ESP%20Victron.pdf
 (if you just want a Victron logger, you just need a Wemos D1, a micro bucket converter and a few wires).
 
 ## Victron_VE_on_Steroids design
