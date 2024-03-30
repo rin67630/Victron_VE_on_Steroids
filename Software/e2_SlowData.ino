@@ -28,17 +28,20 @@ void data1SRun() {
 
 #ifdef A0_IS_SIMUL                                                    //Simulating a solar panel from LDR of a Witty.
   payload.BatI = float(map(A0Raw, 15, 1023, 0, 100 * A0_MAX)) / 300;  // Amperes Simulated Panel
-  payload.BatV = 12.9 + payload.BatI / 2.5;                           // Adding current load effect
-  if (A0Raw > 100) {
-    payload.PanV = 32;
+  if ((BatPoC < 95 ) && (BatPoC >= 30 )) payload.BatV += (payload.BatI - payload.LodI) / (3600 * AH_CELLS) ; //integration of the current to the battery voltage
+  if ((BatPoC >= 95 ) && (payload.LodI < 0 )) payload.BatV += (payload.BatI - payload.LodI) / (3600 * AH_CELLS) ;
+  if ((BatPoC <= 30 ) && (payload.LodI > 0 )) payload.BatV += (payload.BatI - payload.LodI) / (3600 * AH_CELLS) ;
+  if (A0Raw > 200) 
+  {
+    payload.PanV = 38 + float(random(100)) / 100;
   } else {
-    payload.PanV = float(map(A0Raw, 15, 100, 0, 32000)) / 1000;  // Dawn below A0=100
+    payload.PanV = float(map(A0Raw, 15, 200, 0, 37000)) / 1000;  // Dawn below A0=200
   }
-  payload.PanV -= payload.BatI;  // Substract current load effect
+  payload.PanV -= payload.BatI * 0.8;  // Substract current load effect
   payload.BatW = payload.BatV * payload.BatI;
   payload.PanW = payload.BatW * 1.07;  // assuming 93% efficiency
   payload.PanI = payload.PanW / payload.PanV;
-  payload.IOhm = 0.0154; 
+  payload.LodW = payload.BatV * payload.LodI;
 #endif
 
 #ifdef A0_IS_PANEL
@@ -71,9 +74,9 @@ void data1SRun() {
 #ifdef POC_IS_TABLE
   if (payload.BatI > 0, 05)  // chosing the charging series values
   {
-    BatPoC = float(Interpolation::ConstrainedSpline(cha, perc, 10, long(CellV*100)));
+    BatPoC = float(Interpolation::ConstrainedSpline(cha, perc, 10, long(CellV * 100)));
   } else {  // chosing the discharging series values
-    BatPoC = float(Interpolation::ConstrainedSpline(dis, perc, 10, long(CellV*100)));
+    BatPoC = float(Interpolation::ConstrainedSpline(dis, perc, 10, long(CellV * 100)));
   }
 #endif
 }

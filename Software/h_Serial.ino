@@ -54,7 +54,7 @@ void serialRun() {
       break;
 
     case 'V':  //Print Values
-      Console1.printf("BatV:%05.2f BatI:%05.2f BatW: %05.2f PanV: %05.2f PanI: %05.2f PanW: %05.2f LoadI: %05.2f LoadW: %05.2f BatR: %5.4f POC:%02u\n", payload.BatV, payload.BatI, payload.BatW, payload.PanV, payload.PanI, payload.PanW, payload.LodI, payload.LodW, payload.IOhm, payload.ChSt);
+      Console1.printf("BatV:%05.2f BatI:%05.2f BatW: %05.2f PanV: %05.2f PanI: %05.2f PanW: %05.2f LoadI: %05.2f LoadW: %05.2f BatR: %5.4f POC:%4.1f\n", payload.BatV, payload.BatI, payload.BatW, payload.PanV, payload.PanI, payload.PanW, payload.LodI, payload.LodW, payload.IOhm, BatPoC);
       break;
 
     case 'W':  // Weather Plot

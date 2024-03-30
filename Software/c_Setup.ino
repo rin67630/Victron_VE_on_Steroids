@@ -97,7 +97,7 @@ void setup() {
   getWiFi();
 
   //  Serial.printf("MAC address: %s , \nHostname: %s", WiFi.macAddress().c_str(), WiFi.hostname().c_str());   checkthat
-  digitalWrite(BLULED, true);
+  digitalWrite(BLULED, false);
 
 #if defined(SCREEN_IS_64x48) | defined(SCREEN_IS_128x64) | defined(SCREEN_IS_WEMOS32)
   sprintf(charbuff, "IP= ..%03d.%03d", ip[2], ip[3]);
@@ -233,7 +233,7 @@ bme.setPressureOversampling(BME680_OS_4X);
   };
 
   thing["DAY"] >> [](pson& out) {
-    out["BAhDay"] = BatAh[26];
+    out["BAhDay"] = BatAh[27];
     out["B00Ah"] = BatAh[0];
     out["B01Ah"] = BatAh[1];
     out["B02Ah"] = BatAh[2];
@@ -314,7 +314,7 @@ bme.setPressureOversampling(BME680_OS_4X);
     out["PanW"] = payload.PanW;
     out["BatI"] = payload.BatI;
     out["LodW"] = payload.LodW;
-    out["BatAh"] = BatAh[24];
+    out["BatAh"] = BatAh[24];  //  Current Hour
   };
 
   thing["EVENT"] >> [](pson& out) {
@@ -331,18 +331,20 @@ bme.setPressureOversampling(BME680_OS_4X);
   // Retrieve Persistance values
 
   pson persistance;
-#ifdef DASHBRD_IS_THINGER
   thing.get_property("persistance", persistance);
   currentInt = persistance["currentInt"];
   nCurrent = persistance["nCurrent"];
-  BatAh[25] = persistance["Ah/hour"];
-  BatAh[27] = persistance["Ah/yesterday"];
-#endif
   temperature = persistance["temperature"];
   humidity = persistance["humidity"];
   pressure = persistance["pressure"];
   wind_speed = persistance["wind"];
   wind_direction = persistance["direction"];
+
+  pson input;
+  thing.get_property("input", input);
+  resetCoulomb = input["resetCoulomb"];
+  restart = input["restart"];
+  freezePsonUpdate = input["freezePsonUpdate"];
 
   pson statAh;
   thing.get_property("statAh", statAh);  // 0..23=hour, 25=payload.PanI, 26=statAh 24h, 27= BatAhDay, 28=BatAhNight, 29=BatAh22-24
@@ -353,7 +355,7 @@ bme.setPressureOversampling(BME680_OS_4X);
   BatAh[4] = statAh["04h"];
   BatAh[5] = statAh["05h"];
   BatAh[6] = statAh["06h"];
-  BatAh[7] = statAh["09h"];
+  BatAh[7] = statAh["07h"];
   BatAh[8] = statAh["08h"];
   BatAh[9] = statAh["09h"];
   BatAh[10] = statAh["10h"];
@@ -370,9 +372,16 @@ bme.setPressureOversampling(BME680_OS_4X);
   BatAh[21] = statAh["21h"];
   BatAh[22] = statAh["22h"];
   BatAh[23] = statAh["23h"];
-  BatAh[25] = statAh["LastHour"];
-  BatAh[27] = statAh["Yesterday"];
+  BatAh[24] = statAh["CurrHour"]; 
+  BatAh[25] = statAh["Last Hour"];
   BatAh[26] = statAh["Today"];
+  BatAh[27] = statAh["Yesterday"];
+  BatAh[28] = statAh["D-2"];
+  BatAh[29] = statAh["D-3"];
+  BatAh[30] = statAh["D-4"];
+  BatAh[31] = statAh["D-5"];
+  BatAh[32] = statAh["D-6"];
+  BatAh[33] = statAh["D-7"];
 
   pson statVh;
   thing.get_property("statVh", statVh);  // 0..23=hour, 25=payload.PanI, 26=statVh 24h, 27= BatAhDay, 28=BatAhNight, 29=BatAh22-24
@@ -383,7 +392,7 @@ bme.setPressureOversampling(BME680_OS_4X);
   BatVavg[4] = statVh["04h"];
   BatVavg[5] = statVh["05h"];
   BatVavg[6] = statVh["06h"];
-  BatVavg[7] = statVh["09h"];
+  BatVavg[7] = statVh["07h"];
   BatVavg[8] = statVh["08h"];
   BatVavg[9] = statVh["09h"];
   BatVavg[10] = statVh["10h"];
@@ -401,9 +410,14 @@ bme.setPressureOversampling(BME680_OS_4X);
   BatVavg[22] = statVh["22h"];
   BatVavg[23] = statVh["23h"];
   BatVavg[25] = statVh["LastHour"];
-  BatVavg[27] = statVh["Yesterday"];
-  BatVavg[26] = statVh["Today"];
-
+  BatVavg[27] = statVh["Today"];
+  BatVavg[28] = statVh["Yesterday"];
+  BatVavg[29] = statVh["D-2"];
+  BatVavg[30] = statVh["D-3"];
+  BatVavg[31] = statVh["D-4"];
+  BatVavg[32] = statVh["D-5"];
+  BatVavg[33] = statVh["D-6"];
+  BatVavg[34] = statVh["D-7"];
 #endif  // defined (DASHBRD_IS_THINGER)
 
 #ifdef COM_IS_HOURLY
@@ -418,6 +432,11 @@ bme.setPressureOversampling(BME680_OS_4X);
   wirelessPage = ' ';
   serialPage = ' ';
   displayPage = '1';
+
+  payload.BatV = float(cha[5] * NUMBER_CELLS) / 100;  // Begin with 1/2 charged cells
+  payload.IOhm = 0.0154; 
+  payload.LodI = float(AH_CELLS) / 51;
+
   digitalWrite(GRNLED, false);
 
   delay(10000);

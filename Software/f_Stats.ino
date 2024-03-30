@@ -14,26 +14,26 @@ void statsRun() {
   */
 
   // *** Battery hourly integration ***
-  currentInt += payload.BatI;
+  currentInt += payload.BatI - payload.LodI;
   nCurrent++;
-  CellV = payload.BatV / NUMBER_CELLS;
+  CellV = (payload.BatV - (payload.BatI + payload.LodI) * payload.IOhm) / NUMBER_CELLS;
   //state = StateKeywords[payload.ChSt];  //   Keyword for loading State
-  BatAh[24] = currentInt / nCurrent;    // Ah current hour
-  BatVavg[24] = payload.BatV;
+  BatAh[24] = currentInt / nCurrent;  // Ah accumulating
+  BatVavg[24] = CellV * NUMBER_CELLS;
 
   // *** Battery hourly array handling ***
   if (HourExpiring) {
-    BatAh[Hour] = BatAh[24];
+    BatAh[Hour] = BatAh[24];  // expired Hour
     nCurrent = 0;
     currentInt = 0;
-    BatAh[25] = BatAh[Hour];  //last hour
-    BatAh[26] = 0;            // today (0h->current hour)
+    BatAh[25] = BatAh[Hour];  // last expired hour
+    BatAh[26] = 0;            // today (0h->current expired hour)
     for (byte n = 0; n <= Hour; n++) {
-      BatAh[26] = BatAh[26] + BatAh[n];
+      BatAh[26] += BatAh[n];
     }
-    BatVavg[Hour] = payload.BatV;
-    BatVavg[25] = payload.BatV;
-    BatVavg[26] = 0;  // today (0h->current hour)
+    BatVavg[Hour] = BatVavg[24];//Current Hour
+    BatVavg[25] = BatVavg[24];  //Expired Hour
+    BatVavg[26] = 0;            //Today (0h->Expired Hour)
     for (byte n = 0; n <= Hour; n++) {
       BatVavg[26] = BatVavg[26] + BatVavg[n];
     }
@@ -41,14 +41,20 @@ void statsRun() {
   }  // end hour expiring
 
   if (DayExpiring) {
-    BatAh[27] = BatAh[26];
-    BatAh[28] = BatAh[27];
-    BatAh[29] = BatAh[28];
-    BatAh[30] = BatAh[29];
-    BatVavg[27] = BatVavg[26];
-    BatVavg[28] = BatVavg[27];
-    BatVavg[29] = BatVavg[28];
-    BatVavg[30] = BatVavg[29];
+    BatAh[33] = BatAh[32];  // Yesterday
+    BatAh[32] = BatAh[31];  // D-2
+    BatAh[31] = BatAh[30];  // D-3
+    BatAh[30] = BatAh[29];  // D-4
+    BatAh[29] = BatAh[28];  // D-5
+    BatAh[28] = BatAh[27];  // D-6
+    BatAh[27] = BatAh[26];  // D-7
+    BatVavg[33] = BatVavg[32]; // Yesterday
+    BatVavg[32] = BatVavg[31]; // D-2
+    BatVavg[31] = BatVavg[30]; // D-3
+    BatVavg[30] = BatVavg[29]; // D-4
+    BatVavg[29] = BatVavg[28]; // D-5
+    BatVavg[28] = BatVavg[27]; // D-6
+    BatVavg[27] = BatVavg[26]; // D-7
   }
 
 #if defined(DASHBRD_IS_THINGER)
@@ -61,8 +67,6 @@ void statsRun() {
     pson persistance;
     persistance["currentInt"] = currentInt;
     persistance["nCurrent"] = nCurrent;
-    persistance["Ah/hour"] = BatAh[25];
-    persistance["Ah/yesterday"] = BatAh[27];
 
     persistance["temperature"] = temperature;
     persistance["humidity"] = humidity;
@@ -75,7 +79,7 @@ void statsRun() {
     thing.set_property("persistance", persistance, true);
   }
 
-  if (Minute % 10 == 2 && Second == 11)  // call every 10 minutes (one second later)
+  if (Minute % 10 == 2 && Second == 11)  // Update Stats every 6 Minutes. 
   {
     pson statAh;  // 0..23=hour, 25=current.
     statAh["00h"] = BatAh[0];
@@ -85,7 +89,7 @@ void statsRun() {
     statAh["04h"] = BatAh[4];
     statAh["05h"] = BatAh[5];
     statAh["06h"] = BatAh[6];
-    statAh["09h"] = BatAh[7];
+    statAh["07h"] = BatAh[7];
     statAh["08h"] = BatAh[8];
     statAh["09h"] = BatAh[9];
     statAh["10h"] = BatAh[10];
@@ -102,13 +106,20 @@ void statsRun() {
     statAh["21h"] = BatAh[21];
     statAh["22h"] = BatAh[22];
     statAh["23h"] = BatAh[23];
+    statAh["CurrHour"] = BatAh[24];
     statAh["LastHour"] = BatAh[25];
-    statAh["Yesterday"] = BatAh[27];
     statAh["Today"] = BatAh[26];
+    statAh["Yesterday"] = BatAh[27];
+    statAh["D-2"] = BatAh[28];
+    statAh["D-3"] = BatAh[29];
+    statAh["D-4"] = BatAh[30];
+    statAh["D-5"] = BatAh[31];
+    statAh["D-6"] = BatAh[32];
+    statAh["D-7"] = BatAh[33];
     thing.set_property("statAh", statAh);
   }
 
-  if (Minute % 10 == 2 && Second == 11)  // call every 10 minutes (one second later)
+  if (Minute % 10 == 2 && Second == 21)  // Update Stats every 6 Minutes. 
   {
     pson statVh;  // 0..23=hour, 25=current.
     statVh["00h"] = BatVavg[0];
@@ -118,7 +129,7 @@ void statsRun() {
     statVh["04h"] = BatVavg[4];
     statVh["05h"] = BatVavg[5];
     statVh["06h"] = BatVavg[6];
-    statVh["09h"] = BatVavg[7];
+    statVh["07h"] = BatVavg[7];
     statVh["08h"] = BatVavg[8];
     statVh["09h"] = BatVavg[9];
     statVh["10h"] = BatVavg[10];
@@ -136,8 +147,14 @@ void statsRun() {
     statVh["22h"] = BatVavg[22];
     statVh["23h"] = BatVavg[23];
     statVh["LastHour"] = BatVavg[25];
+    statVh["Today"] = BatVavg[26];
     statVh["Yesterday"] = BatVavg[27];
-    statVh["Today"] = BatAh[26];
+    statVh["D-2"] = BatVavg[28];
+    statVh["D-3"] = BatVavg[29];
+    statVh["D-4"] = BatVavg[30];
+    statVh["D-5"] = BatVavg[31];
+    statVh["D-6"] = BatVavg[32];
+    statVh["D-7"] = BatVavg[33];
     thing.set_property("statVh", statVh);
   }
 #endif

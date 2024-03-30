@@ -36,6 +36,15 @@ void getWiFi()
     }
     delay(50);
   }
+  
+  #ifdef CONTR_IS_ESP8266
+  WiFi.setOutputPower(WIFI_POWER);         // 0..20 
+  #else
+ // WiFi.setTxPower(byte(WIFI_POWER));       // 0..78
+  #endif
+
+  WiFi.persistent(true);
+
   ip = WiFi.localIP();
   Serial.print("Done: RRSI= ");   Serial.print(WiFi.RSSI());
   sprintf(charbuff, "dB, IP= %03d . %03d . %03d . %03d \n", ip[0], ip[1], ip[2], ip[3]);   Serial.printf(charbuff);

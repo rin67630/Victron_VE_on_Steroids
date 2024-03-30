@@ -44,7 +44,9 @@ Thanks to the respective owners of all libraries used:
 -Arduinojson by Benoit Blanchon <blog.benoitblanchon.fr>
 -ThingerCore32 and Thinger.io by Alvaro Luis Bustamante
 -TelnetStream by Juraj Andrassy
--INA226 by Rob Tillaart 
+-INA226 by Rob Tillaart
+-InterpolationLib by Luis Llamas
+
 The other libraries are the standard libs from Arduino, Espressif, Adafruit...
 
 *** Forked code ***

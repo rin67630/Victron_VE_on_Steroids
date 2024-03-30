@@ -1,7 +1,7 @@
 //*** Convenience macro for Timing ***
 #define runEvery(t) for (static uint16_t _lasttime; (uint16_t)((uint16_t)millis() - _lasttime) >= (t); _lasttime += (t))  // Macro for Timing
 
-//*** Include Configuration files ***
+//*** Include Own Configuration files ***
 #include "Credentials.h"
 #include "Config.h"
 
@@ -12,14 +12,6 @@
 #include "time.h"  // built-in
 #include <EEPROM.h>
 #include "InterpolationLib.h"
-
-// *** Optional libraries ***
-/* deprecated
-#if defined(D7_IS_VICTRON) && not defined(CONTR_IS_ESP8266)
-#include <HardwareSerial.h>
-HardwareSerial SerialPort(2); // use UART2
-#endif
-*/
 
 #ifdef CONTR_IS_ESP8266
 #define STDLED BLULED
@@ -180,10 +172,14 @@ boolean TrigEvent;
 unsigned int RunMillis[28];  // keep trace of consumed time
 
 byte serialReceived;
+//*** Variables for User Commands ***
 byte serialPage;
 byte displayPage;
 byte displaySubPage;
 byte wirelessPage;
+bool resetCoulomb;
+bool restart;
+bool freezeUpdate;
 
 static IPAddress ip;
 
@@ -198,7 +194,7 @@ static byte blockindex = 0;
 bool new_data = false;
 bool blockend = false;
 #endif
-String StateKeywords[] = {"Off ","Low", "Fau", "Bul" , "Abs", "Flo", "Str", "Equ", "   ", "   "};
+String StateKeywords[] = {"Off ","Low", "Fau", "Bul" , "Abs", "Flo", "Str", "Equ", "   ","   "};
 
 
 //***Parameters Battery POC
@@ -267,9 +263,9 @@ float BatMV;  //  Number of Deep Discharges
 float BatOV;  //  Number of Overvoltages
 
 //*** Hourly integrated Values
-float BatAh[32];  //  Ah of the current hour
-//float BatWh[32];  //  Wh of the current hour
-float BatVavg[32];  //  Avg voltage in hour
+float BatAh[36];    //  Ah statistics
+//float BatWh[36];  //  Wh statistics
+float BatVavg[36];  //  Avg Statistics
 float currentInt;   //  Averaging bucket for hourly stats
 long nCurrent;      //  Counter for averaging
 
