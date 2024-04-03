@@ -179,7 +179,7 @@ byte displaySubPage;
 byte wirelessPage;
 bool resetCoulomb;
 bool restart;
-bool freezeUpdate;
+bool freezePsonUpdate;
 
 static IPAddress ip;
 
