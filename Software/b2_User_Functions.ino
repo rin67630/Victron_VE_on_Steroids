@@ -136,7 +136,7 @@ void GatherValues()                   // Translate the Victron protocol Keywords
 #endif
     if (String(keywords[i]) == "IL")    payload.LodI = atof(value[i]) / 1000;
 
-    if (String(keywords[i]) == "CS")    payload.ChSt = atoi(value[i] * 10);
+    if (String(keywords[i]) == "CS")    payload.ChSt = atoi(value[i]) * 10;
 
     if (String(keywords[i]) == "ERR")   payload.Err = atoi(value[i]);
   }
