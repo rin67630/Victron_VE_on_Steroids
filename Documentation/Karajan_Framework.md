@@ -9,10 +9,11 @@ for each instrument (purpose):
 -Configuration  
 -Credentials (not to be published)  
 -Libraries and global variables  
--Network functions  
+-Krarajan Network functions  
 -User functions  
 -Setup  
 -Menu for user interaction.  
+-Immediate Data (processed as fast as possible, only for asynchonous data from other devices)
 -Fast data (to be processed at 125mS pace)  
 -Slow data (to be processed at 1S pace)  
 -Statistics (to be processed at 1S pace)  
@@ -21,12 +22,10 @@ for each instrument (purpose):
 -Wireless comminucation (to be processed at 1S pace)  
 and finally the scheduler itself.  
 With that organisation the developer can easily jump to the desired part of the code to make correction without searching pages of code for the right place.  
-All jobs to be processed at 1S pace are distributed in 125mS slices, so to dispatch the processing time and avoid to do 
-everything at the same time.  
+All jobs to be processed at 1S pace are distributed in 125mS slices, so to dispatch the processing time and avoid to do everything at the same time.  
+
 Karajan provides a measuring/reporting function for the time taken by every task.  
-
 It provides all initializations for WiFi and time synchronization, so you can just start with your part.  
-
 It provides variables to do a lot of stuff at given times and gives global variables as e.g.  
 Bytes:  
 - Second, Minute, Hour...  
