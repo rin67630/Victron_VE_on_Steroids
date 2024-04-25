@@ -17,19 +17,17 @@ WiFiUDP UDP;
 
 HTTPClient http;
 WiFiClient wifiClient;
-//AutoConnectCredential();
+
 
 void getWiFi()
 {
   Serial.printf("Reconnecting to %s\n", WIFI_SSID);
-
   byte retry;
   WiFi.begin();
   WiFi.waitForConnectResult();
 
-  if (WiFi.status() == WL_CONNECTED) {
-    Serial.println("Connected");
-  } else {
+  if (WiFi.status() != WL_CONNECTED) 
+  {
     Serial.println("Fail, try Credentials\n");
     retry = 0;
     WiFi.begin(WIFI_SSID, WIFI_PASS);
@@ -37,25 +35,24 @@ void getWiFi()
     while (WiFi.status() != WL_CONNECTED)
     {
       Serial.print(".");
-      digitalWrite(STDLED, not digitalRead(STDLED));
+      digitalWrite(LED_BUILTIN, not digitalRead(LED_BUILTIN ));
       delay(WIFI_REPEAT);
       if (retry++ >= WIFI_MAXTRIES) break;
     }
   }
-  if (WiFi.status() == WL_CONNECTED)
+  delay(WIFI_REPEAT);
+  digitalWrite(LED_BUILTIN, false);
+  WiFi.waitForConnectResult();  
+  if (WiFi.status() != WL_CONNECTED)
   {
-    WiFi.setAutoReconnect(1);
-    WiFi.persistent(1);
-  } else {
     Serial.println("Fail, try SmartConfig\n");
     retry = 0;
     WiFi.beginSmartConfig();
-    digitalWrite(STDLED, false);
     while (WiFi.status() != WL_CONNECTED)
     {
       Serial.print(".");
-      digitalWrite(STDLED, not digitalRead(STDLED));
-      delay(WIFI_REPEAT * 10);
+      digitalWrite(LED_BUILTIN, not digitalRead(LED_BUILTIN ));
+      delay(WIFI_REPEAT * 2);
       if (retry++ >= WIFI_MAXTRIES) break;
       if (WiFi.smartConfigDone())
       {
@@ -64,14 +61,17 @@ void getWiFi()
       }
     }
   }
+  WiFi.waitForConnectResult();
   if (WiFi.status() == WL_CONNECTED)
   {
-    WiFi.setAutoReconnect(1);
-    WiFi.persistent(1);
+    WiFi.setAutoReconnect(true);
+    WiFi.persistent(true);
     Serial.println("Connection OK!");
+    digitalWrite(LED_BUILTIN, true);    //Network is ready, no blue led.
     // WiFi.printDiag(Serial);
   } else {
     Serial.println("giving up! no Network");
+    digitalWrite(LED_BUILTIN, false);    //No Network, blue led glows.
     WiFi.mode(WIFI_OFF);
   }
 
