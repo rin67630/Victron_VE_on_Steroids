@@ -42,9 +42,32 @@
                               // 0 if no ESP32 supervisor, else 1..4
 
 //--------------------------- WiFi Options -------------------------------------
-#define WIFI_REPEAT          1000     //mS for retry
+#define WIFI_REPEAT          500      //mS for retry
 #define WIFI_MAXTRIES        30
-#define WIFI_POWER           7.5
+
+#ifdef ARDUINO_ARCH_ESP8266
+#define WIFI_POWER           7.5   // from 0.5 to 21.5 full power (more current draw)
+#else                              // ESP32
+#define WIFI_POWER           WIFI_POWER_11dBm
+#endif
+/*
+ Available ESP32 RF power parameters: 
+ WIFI_POWER_19_5dBm // 19.5dBm (19.5dBm output, highest supply current ~150mA) 
+ WIFI_POWER_19dBm // 19dBm 
+ WIFI_POWER_18_5dBm // 18.5dBm 
+ WIFI_POWER_17dBm // 17dBm 
+ WIFI_POWER_15dBm // 15dBm 
+ WIFI_POWER_13dBm // 13dBm 
+ WIFI_POWER_11dBm // 11dBm 
+ WIFI_POWER_8_5dBm // 8dBm 
+ WIFI_POWER_7dBm // 7dBm 
+ WIFI_POWER_5dBm // 5dBm 
+ WIFI_POWER_2dBm // 2dBm 
+ WIFI_POWER_MINUS_1dBm // -1dBm (For -1dBm output, lowest supply current ~120mA)
+ Available ESP8266 RF power parameters: any value in 0.5 steps from
+0    (for lowest RF power output, supply current ~ 70mA  to
+20.5 (for highest RF power output, supply current ~ 80mA  
+ */
 #define GRACE_PAUSE          //Suspend Network processing for a grace pause, if the remote server takes too long to react, in order to keep being reactive on menues
 
 //----------------------DO NOT EDIT until you know what you do -------------
@@ -55,4 +78,3 @@
 #define REDLED            15    // D8
 #define BLULED            13    // D7 <-- Victron
 #define GRNLED            12    // D6
-#define STDLED            BLULED

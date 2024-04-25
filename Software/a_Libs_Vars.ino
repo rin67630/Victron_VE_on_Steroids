@@ -16,6 +16,7 @@
 #include <ESP8266HTTPClient.h>
 #elif defined(ARDUINO_ARCH_ESP32)
 #include <WiFi.h>
+// #define LED_BUILTIN 2       //no built-in LED on an ESP32, using GPIO2.
 //#include <WebServer.h>
 #include <HTTPClient.h>
 //using SDClass = fs::SDFS;

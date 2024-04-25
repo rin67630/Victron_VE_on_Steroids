@@ -78,7 +78,7 @@ void getWiFi()
 #ifdef ARDUINO_ARCH_ESP8266
   WiFi.setOutputPower(WIFI_POWER);         // 0..20
 #else
-  WiFi.setTxPower(byte(WIFI_POWER));       // 0..78
+  WiFi.setTxPower(WIFI_POWER);       // see Config.h
 #endif
   ip = WiFi.localIP();
   Serial.print("Done: RRSI= ");  Serial.print(WiFi.RSSI()); Serial.print("dB");
@@ -197,4 +197,13 @@ void initOTA() {
 
     ArduinoOTA.begin();
   }
+}
+
+void ESP32WiFi_reset()   // does not work yet
+{
+//   wifi_config_t current_conf;
+//   esp_wifi_get_config((wifi_interface_t)ESP_IF_WIFI_STA, &current_conf);
+//   memset(current_conf.sta.ssid, 0, sizeof(current_conf.sta.ssid));
+//   memset(current_conf.sta.password, 0, sizeof(current_conf.sta.password));
+//   esp_wifi_set_config((wifi_interface_t)ESP_IF_WIFI_STA, &current_conf);
 }

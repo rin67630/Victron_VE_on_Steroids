@@ -1,5 +1,4 @@
 void menuRun() {
-
 #ifdef SCREEN_IS_TTGO
   Buttons.processButtons();
   if (Buttons.shortPress(UP)) {
@@ -13,6 +12,7 @@ void menuRun() {
 #endif
 
   serialReceived = Console1.read();
+
   switch (serialReceived) {
     // Switching displays
     case '0':
@@ -30,9 +30,13 @@ void menuRun() {
       tft.fillScreen(TFT_BLACK);
 #endif
       break;
-   case 'X':  // forgetWiFI and Reset ESP
+    case 'X':  // forgetWiFI and Reset ESP
       Console1.printf("\nforgetting WiFI! \n");
+      #if defined(ARDUINO_ARCH_ESP8266)
       ESP.eraseConfig();
+      #else
+      ESP32WiFi_reset();
+      #endif
     //intentionally no break here it goes further with 'Z' !
     case 'Z':  // Reset ESP
       Console1.printf("\nReset Device, Bye! \n");
@@ -53,13 +57,13 @@ void menuRun() {
       TelnetStream.stop();
       break;
 #endif
-      /*
-    case 'S':  // Swap Serial
+    /*
+      case 'S':  // Swap Serial
       Console1.println("Swapping Serial");
       Serial.flush();
       Serial.swap();
       break;
-      */
+    */
     case 'B':  //Battery Report
       Console1.printf("\n Battery Stats\n");
       serialPage = 'B';
