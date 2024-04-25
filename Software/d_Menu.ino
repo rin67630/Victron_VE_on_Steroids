@@ -30,7 +30,10 @@ void menuRun() {
       tft.fillScreen(TFT_BLACK);
 #endif
       break;
-
+   case 'X':  // forgetWiFI and Reset ESP
+      Console1.printf("\nforgetting WiFI! \n");
+      ESP.eraseConfig();
+    //intentionally no break here it goes further with 'Z' !
     case 'Z':  // Reset ESP
       Console1.printf("\nReset Device, Bye! \n");
 #if defined(TERM_IS_TELNET)
