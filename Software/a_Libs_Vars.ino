@@ -17,7 +17,9 @@
 #endif
 #if defined(ARDUINO_ARCH_ESP32)
 #include <WiFi.h>
+#ifndef LED_BUILTIN
 #define LED_BUILTIN 5       //no built-in LED on an ESP32, using GPIO5 (Wemos ESP32).
+#endif
 //#include <WebServer.h>
 #include <HTTPClient.h>
 //using SDClass = fs::SDFS;
@@ -83,12 +85,6 @@ TFT_eSPI tft = TFT_eSPI();  // Invoke custom library
 #ifdef D7_IS_DROK
 #include <BuckPSU.h>
 BuckPSU psu(Serial);
-#endif
-
-#if defined(D7_IS_VICTRON) && defined(ARDUINO_ARCH_ESP32)
-#include <HardwareSerial.h>
-HardwareSerial Serial2(2);
-// serial(1) = pin27=RX GPIO16, pin26=TX GPIO17
 #endif
 
 //*** Buffers ***

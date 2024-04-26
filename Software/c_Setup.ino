@@ -11,10 +11,7 @@ void setup() {
   //Initialize Serial Terminal for Boot
   Serial.begin(SERIAL_SPEED);
   Serial.setRxBufferSize(1024);
-  //Initialize Second Serial for Victron
-#if defined(D7_IS_VICTRON) && defined(ARDUINO_ARCH_ESP32)
-  Serial2.begin(115200, SERIAL_8N1, 13);  //define Serial input 2 on d7 (GPIO13)
-#endif
+
   // Serial.setDebugOutput(true);
   delay(1000);  // Wait for serial monitor to be started
   Serial.print("\n\n\nCompiled from: ");
@@ -153,7 +150,7 @@ void setup() {
   delay(500);
 #endif
 
-#if defined(D7_IS_VICTRON) || defined(D7_IS_DROK) && defined(ARDUINO_ARCH_ESP8266)
+#if defined(D7_IS_VICTRON) && defined(ARDUINO_ARCH_ESP8266)
   Serial.println("Serial Swap to D7/D8");
   Serial.flush();
   delay(500);
