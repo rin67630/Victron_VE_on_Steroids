@@ -12,7 +12,7 @@ void setup() {
   Serial.begin(SERIAL_SPEED);
   Serial.setRxBufferSize(1024);
   //Initialize Second Serial for Victron
-#if defined(D7_IS_VICTRON) || defined(D7_IS_DROK) && not defined(ARDUINO_ARCH_ESP8266)
+#if defined(D7_IS_VICTRON) && defined(ARDUINO_ARCH_ESP32)
   Serial2.begin(115200, SERIAL_8N1, 13);  //define Serial input 2 on d7 (GPIO13)
 #endif
   // Serial.setDebugOutput(true);
@@ -68,20 +68,15 @@ void setup() {
 
   pinMode(REDLED, OUTPUT);  // Tx0 after Serial.Swap()
   pinMode(GRNLED, OUTPUT);  // For debugging
+  pinMode(LED_BUILTIN, OUTPUT);  // Onboard LED 
 #if defined (D7_IS_VICTRON) || defined (D7_IS_DROK)
   pinMode(BLULED, INPUT);   // Rx0 after Serial.Swap()
 #else
   pinMode(BLULED, OUTPUT);  // Use normally
 #endif
 
-#if defined(SCREEN_IS_64x48) | defined(SCREEN_IS_128x64) | defined(SCREEN_IS_WEMOS32)
+#if defined(SCREEN_IS_64x48) || defined(SCREEN_IS_128x64) || defined(SCREEN_IS_WEMOS32) || defined(SCREEN_IS_HELTEC)
   // Initialising the UI will init the display too.
-  display.drawString(0, 0, DEVICE_NAME);
-  display.drawString(0, 12, "Try connect..");
-  display.display();
-#endif
-
-#ifdef SCREEN_IS_HELTEC
   display.drawString(0, 0, "Device Name: ");
   display.drawString(64, 0, DEVICE_NAME);
   display.drawString(0, 12, "Try connect ");
@@ -99,18 +94,12 @@ void setup() {
 
   digitalWrite(BLULED, false);
 
-#if defined(SCREEN_IS_64x48) | defined(SCREEN_IS_128x64) | defined(SCREEN_IS_WEMOS32)
+#if defined(SCREEN_IS_64x48) | defined(SCREEN_IS_128x64) | defined(SCREEN_IS_WEMOS32) || defined(SCREEN_IS_HELTEC)
   sprintf(charbuff, "IP= ..%03d.%03d", ip[2], ip[3]);
   display.drawString(0, 24, charbuff);
   display.drawString(0, 36, "Connected");
   display.display();
   delay(2000);
-#endif
-
-#ifdef SCREEN_IS_HELTEC
-  sprintf(charbuff, "IP= %03d . %03d . %03d . %03d", ip[0], ip[1], ip[2], ip[3]);
-  display.drawString(0, 48, charbuff);
-  display.display();
 #endif
 
 #ifdef SCREEN_IS_TTGO
@@ -128,7 +117,7 @@ void setup() {
   sprintf(charbuff, "Now: %02d:%02d, %02d %s %04d", Hour, Minute, Day, MonthName, Year);
   Serial.println(charbuff);
 
-#ifdef SCREEN_IS_HELTEC
+#if defined(SCREEN_IS_64x48) | defined(SCREEN_IS_128x64) | defined(SCREEN_IS_WEMOS32) || defined(SCREEN_IS_HELTEC)
   display.drawString(0, 60, charbuff);
   display.display();
 #endif
@@ -169,6 +158,11 @@ void setup() {
   Serial.flush();
   delay(500);
   Serial.swap();
+#endif
+
+#if defined(D7_IS_VICTRON) && defined(ARDUINO_ARCH_ESP32)
+  Serial.println("Serial start on GPIO16,17");
+  Serial2.begin(SERIAL_SPEED);
 #endif
 
 #if defined INA_IS_226

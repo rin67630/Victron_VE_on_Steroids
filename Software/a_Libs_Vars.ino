@@ -14,14 +14,14 @@
 #include <ESP8266WiFi.h>
 //#include <ESP8266WebServer.h>
 #include <ESP8266HTTPClient.h>
-#elif defined(ARDUINO_ARCH_ESP32)
+#endif
+#if defined(ARDUINO_ARCH_ESP32)
 #include <WiFi.h>
-// #define LED_BUILTIN 2       //no built-in LED on an ESP32, using GPIO2.
+#define LED_BUILTIN 5       //no built-in LED on an ESP32, using GPIO5 (Wemos ESP32).
 //#include <WebServer.h>
 #include <HTTPClient.h>
 //using SDClass = fs::SDFS;
 #endif
-
 
 //#include <AutoConnectCredential.h>
 #ifdef SCREEN_IS_64x48
@@ -85,6 +85,12 @@ TFT_eSPI tft = TFT_eSPI();  // Invoke custom library
 BuckPSU psu(Serial);
 #endif
 
+#if defined(D7_IS_VICTRON) && defined(ARDUINO_ARCH_ESP32)
+#include <HardwareSerial.h>
+HardwareSerial Serial2(2);
+// serial(1) = pin27=RX GPIO16, pin26=TX GPIO17
+#endif
+
 //*** Buffers ***
 static char charbuff[120];  //Char buffer for many functions
 
@@ -129,12 +135,6 @@ ThingerESP32 thing(THINGER_USERNAME,  DEVICE_NAME, DEVICE_CREDENTIALS);
 #define Console1 TelnetStream
 #endif
 
-/*
-  #ifndef SCREEN_IS_NONE
-  #include "SSD1306Wire.h"  // from https://github.com/ThingPulse/esp8266-oled-ssd1306/
-  #endif
-*/
-// *** Instanciations ***
 
 // Parameters for MoToButtons
 #ifdef SCREEN_IS_TTGO

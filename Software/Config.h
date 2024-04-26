@@ -27,7 +27,7 @@
 #define D0_IS_NONE        // _NONE , _RELAY1
 #define D5_IS_NONE        // _NONE , _RELAY2
 #define D6_IS_NONE        // _NONE , _RELAY3, _VE_BLOCK, _VE_START_STOP
-#define D7_IS_NONE        // _NONE , _RELAY4; _VICTRON _DROK
+#define D7_IS_VICTRON        // _NONE , _RELAY4; _VICTRON _DROK (DROK only ESP8266)
 #define D8_IS_NONE        // _NONE , _DROK
 //#include "MPPT_75_15.h"   // Type of Victron controller (only relevant if D7_IS_VICTRON)
 #include "J3806.h"        // Type of DC/DC controler (only relevant if D7_IS_DROK)
@@ -78,3 +78,8 @@
 #define REDLED            15    // D8
 #define BLULED            13    // D7 <-- Victron
 #define GRNLED            12    // D6
+
+
+#if defined(D7_IS_DROK) && defined(ARDUINO_ARCH_ESP32)
+#error "D7_IS_DROK not possible on ESP32"
+#endif
