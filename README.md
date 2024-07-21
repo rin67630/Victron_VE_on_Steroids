@@ -49,6 +49,9 @@ The current default Thinger Screen with a one minute pace looks like that:
 You can get a one second-pace as well (however only building up when page is active to limit server load)
 ![image](https://github.com/rin67630/Victron_VE_on_Steroids/assets/14197155/3b21a957-1d55-4a91-ba97-a3c7f1078e52)   
 Finally you can see the MPPT algorithm working!
+You can also get detailed statistics online:
+<img width="745" alt="image" src="https://github.com/user-attachments/assets/4237b0f1-3ee9-4632-9f16-18ee28ea0493">
+
 
 But everyone is free to design his own dashboard online !  
 You can get all that from a cheap ESP8266 like a Wemos D1 clone for less than 4$. 
