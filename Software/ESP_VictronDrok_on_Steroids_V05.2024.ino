@@ -56,7 +56,9 @@ Thanks to the respective owners of all libraries used:
 The other libraries are the standard libs from Arduino, Espressif, Adafruit...
 
 *** Forked code ***
--Victron Parser: Thanks to Datjan for his parser code: https://github.com/datjan/esp8266-victron-mppt-solarchargecontroller
+-Victron Parser: Thanks to Datjan / Physee for their parser code: 
+https://github.com/datjan/esp8266-victron-mppt-solarchargecontroller / 
+https://github.com/physee/Victron.Arduino-ESP8266
 
 Presentation music: 
 Lights by Sakura Girl | https://soundcloud.com/sakuragirl_official
